@@ -25,7 +25,7 @@ class Fish extends THREE.Object3D {
     this.shape.quadraticCurveTo(0.2, -0.35, 0.5, -0.2);
     this.shape.lineTo(0.3, 0);
 
-    this.options = { depth: 0.05, steps: 1, bevelEnabled: true, bevelThickness: 0.2};
+    this.options = { depth: 0.2, steps: 1, bevelEnabled: false};
     this.fishgeo = new THREE.ExtrudeGeometry(this.shape, this.options);
     this.fish = new THREE.Mesh(this.fishgeo, this.material);
 

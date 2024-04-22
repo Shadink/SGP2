@@ -34,7 +34,7 @@ class Penwin extends THREE.Object3D {
     this.wing2.position.set(0, 0, 0.2);
 
 
-    // Torso
+    //Torso
     this.torsogeo = new THREE.CylinderGeometry(0, 0.5, 1, 20);
     this.torso = new THREE.Mesh(this.torsogeo, this.blackmaterial);
 

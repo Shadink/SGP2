@@ -52,8 +52,8 @@ class MyScene extends THREE.Scene {
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
     //this.model = new Tubo(this.gui, "Controles del tubo");
-    //this.model = new Fish(this.gui, "Controles del pez");
-    this.model = new Penwin(this.gui, "Controles del pingu");
+    this.model = new Fish(this.gui, "Controles del pez");
+    //this.model = new Penwin(this.gui, "Controles del pingu");
     this.add (this.model);
   }
   
