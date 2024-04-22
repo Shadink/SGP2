@@ -9,6 +9,8 @@ import { TrackballControls } from '../libs/TrackballControls.js'
 // Clases de mi proyecto
 
 import { Tubo } from './Tubo.js'
+import { Fish } from './Fish.js'
+import { Penwin } from './Penwin.js'
 
  
 /// La clase fachada del modelo
@@ -49,7 +51,9 @@ class MyScene extends THREE.Scene {
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    this.model = new Tubo(this.gui, "Controles del tubo");
+    //this.model = new Tubo(this.gui, "Controles del tubo");
+    //this.model = new Fish(this.gui, "Controles del pez");
+    this.model = new Penwin(this.gui, "Controles del pingu");
     this.add (this.model);
   }
   
@@ -60,7 +64,7 @@ class MyScene extends THREE.Scene {
     //   Los planos de recorte cercano y lejano
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100);
     // También se indica dónde se coloca
-    this.camera.position.set (10, 2, 10);
+    this.camera.position.set (2, 0, 0);
     // Y hacia dónde mira
     var look = new THREE.Vector3 (0,0,0);
     this.camera.lookAt(look);
