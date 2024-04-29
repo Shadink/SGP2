@@ -12,6 +12,7 @@ import { Tubo } from './Tubo.js'
 import { Fish } from './Fish.js'
 import { Penwin } from './Penwin.js'
 import { SeaLion } from './SeaLion.js'
+import { Puffin } from './Puffin.js'
 
  
 /// La clase fachada del modelo
@@ -42,6 +43,8 @@ class MyScene extends THREE.Scene {
     
     // Un suelo 
     //this.createGround ();
+
+    //this.createWall ();
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
     // Todas las unidades están en metros
@@ -55,7 +58,8 @@ class MyScene extends THREE.Scene {
     //this.model = new Tubo(this.gui, "Controles del tubo");
     //this.model = new Fish(this.gui, "Controles del pez");
     //this.model = new Penwin(this.gui, "Controles del pingu");
-    this.model = new SeaLion(this.gui, "Controles del león marino");
+    //this.model = new SeaLion(this.gui, "Controles del león marino");
+    this.model = new Puffin(this.gui, "Controles del frailecillo");
 
     this.add (this.model);
   }
@@ -91,8 +95,8 @@ class MyScene extends THREE.Scene {
     var geometryGround = new THREE.BoxGeometry (0.5,0.02,0.5);
     
     // El material se hará con una textura de madera
-    var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
-    var materialGround = new THREE.MeshStandardMaterial ({map: texture});
+    //var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
+    var materialGround = new THREE.MeshBasicMaterial({ color: 0x000000 });
     
     // Ya se puede construir el Mesh
     var ground = new THREE.Mesh (geometryGround, materialGround);
@@ -103,6 +107,26 @@ class MyScene extends THREE.Scene {
     
     // Que no se nos olvide añadirlo a la escena, que en este caso es  this
     this.add (ground);
+  }
+
+  createWall() {
+    // La geometría es una caja con muy poca altura
+    var geometryWall = new THREE.BoxGeometry (0.02,1,0.5);
+    
+    // El material se hará con una textura de madera
+    //var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
+    var materialWall = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    
+    // Ya se puede construir el Mesh
+    var wall = new THREE.Mesh (geometryWall, materialWall);
+    
+    // Todas las figuras se crean centradas en el origen.
+    // El suelo lo bajamos la mitad de su altura para que el origen del mundo se quede en su lado superior
+    wall.position.x = -0.5;
+    wall.position.y = 0.25;
+    
+    // Que no se nos olvide añadirlo a la escena, que en este caso es  this
+    this.add (wall);
   }
   
   createGUI () {
