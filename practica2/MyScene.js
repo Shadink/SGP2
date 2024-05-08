@@ -5,6 +5,7 @@
 import * as THREE from '../libs/three.module.js'
 import { GUI } from '../libs/dat.gui.module.js'
 import { TrackballControls } from '../libs/TrackballControls.js'
+import * as TWEEN from '../libs/tween.esm.js'
 
 // Clases de mi proyecto
 
@@ -13,6 +14,9 @@ import { Fish } from './Fish.js'
 import { Penwin } from './Penwin.js'
 import { SeaLion } from './SeaLion.js'
 import { Puffin } from './Puffin.js'
+import { MoonFish } from './MoonFish.js'
+import { Sardine } from './Sardine.js'
+
 
  
 /// La clase fachada del modelo
@@ -55,13 +59,34 @@ class MyScene extends THREE.Scene {
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    //this.model = new Tubo(this.gui, "Controles del tubo");
+    this.tube = new Tubo(this.gui, "Controles del tubo");
     //this.model = new Fish(this.gui, "Controles del pez");
-    //this.model = new Penwin(this.gui, "Controles del pingu");
+    this.penwin = new Penwin(this.gui, "Controles del pingu");
     //this.model = new SeaLion(this.gui, "Controles del león marino");
-    this.model = new Puffin(this.gui, "Controles del frailecillo");
+    //this.model = new Puffin(this.gui, "Controles del frailecillo");
+    //this.model = new MoonFish(this.gui, "Controles del frailecillo");
+    //this.model = new Sardine(this.gui, "Controles del frailecillo");
 
-    this.add (this.model);
+    this.segmentos = 100;
+    this.binormales = this.tube.tubepath.computeFrenetFrames(this.segmentos, true).binormals;
+    
+    var origen = {t : 0};
+    var fin = {t : 1};
+    var tiempoDeRecorrido = 30000;
+
+    this.animacion = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
+      var posicion = this.tube.tubepath.getPointAt(origen.t);
+      this.penwin.position.copy(posicion);
+      var tangente = this.tube.tubepath.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.penwin.up = this.binormales[Math.floor(origen.t * this.segmentos)];
+      this.penwin.lookAt(posicion);
+    });
+
+    this.penwin.scale.set(0.5, 0.5, 0.5);
+
+    this.add(this.penwin);
+    this.add (this.tube);
   }
   
   createCamera () {
@@ -244,7 +269,8 @@ class MyScene extends THREE.Scene {
     this.cameraControl.update();
     
     // Se actualiza el resto del modelo
-    this.model.update();
+    this.penwin.update();
+    this.animacion.update();
     
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
     // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".

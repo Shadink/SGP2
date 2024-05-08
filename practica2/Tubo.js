@@ -14,7 +14,7 @@ class Tubo extends THREE.Object3D {
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
     this.material = new THREE.MeshNormalMaterial();
 
-    var pts = [new THREE.Vector3(0, 0, 0),
+    this.pts = [new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(2, 0, 0),
       new THREE.Vector3(3, -2, 1),
       new THREE.Vector3(5, -1, 0.5),
@@ -33,11 +33,11 @@ class Tubo extends THREE.Object3D {
       new THREE.Vector3(-2, -5, 0),
       ];
 
-    var tubepath = new THREE.CatmullRomCurve3(pts, true);
+    this.tubepath = new THREE.CatmullRomCurve3(this.pts, true);
     var res = 200;
     var radio = 0.5;
     var segmentos = 20;
-    var tubogeo = new THREE.TubeGeometry(tubepath, res, radio, segmentos, true);
+    var tubogeo = new THREE.TubeGeometry(this.tubepath, res, radio, segmentos, true);
 
     this.tubo = new THREE.Mesh(tubogeo, this.material);
 

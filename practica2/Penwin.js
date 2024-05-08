@@ -26,11 +26,11 @@ class Penwin extends THREE.Object3D {
     this.options = { depth: 0.01, steps: 2, bevelEnabled: false};
     this.winggeo = new THREE.ExtrudeGeometry(this.wingshape, this.options);
     this.wing = new THREE.Mesh(this.winggeo, this.blackmaterial);
-    this.wing.rotation.y = 90;
+    this.wing.rotation.y = (90 * Math.PI) / 180;
     this.wing.position.set(0, 0, -0.2);
 
     this.wing2 = new THREE.Mesh(this.winggeo, this.blackmaterial);
-    this.wing2.rotation.y = -90;
+    this.wing2.rotation.y = (-90 * Math.PI) / 180;
     this.wing2.position.set(0, 0, 0.2);
 
 

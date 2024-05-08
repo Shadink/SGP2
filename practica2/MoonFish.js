@@ -1,7 +1,7 @@
 
 import * as THREE from 'three'
 
-class Fish extends THREE.Object3D {
+class MoonFish extends THREE.Object3D {
   constructor(gui,titleGui) {
     super();
     
@@ -11,23 +11,30 @@ class Fish extends THREE.Object3D {
     
     this.shape = new THREE.Shape();
 
-    this.material = new THREE.MeshBasicMaterial({ color: 0xA39D9B });
+    this.material = new THREE.MeshBasicMaterial({ color: 0x566A7D });
 
-    this.shape.moveTo(0.3, 0);
-    this.shape.lineTo(0.5,0.2);
-    this.shape.quadraticCurveTo(0.2, 0.35, -0.1, 0.4);
-    this.shape.quadraticCurveTo(-0.3, 0.3, -0.5, 0.1);
-    this.shape.quadraticCurveTo(-0.6, 0.3, -0.9, 0.4);
-    this.shape.quadraticCurveTo(-0.8, 0.2, -0.7, 0);
-    this.shape.quadraticCurveTo(-0.8, -0.2, -0.9, -0.4);
-    this.shape.quadraticCurveTo(-0.6, -0.3, -0.5, -0.1);
-    this.shape.quadraticCurveTo(-0.3,-0.3, -0.1, -0.4);
-    this.shape.quadraticCurveTo(0.2, -0.35, 0.5, -0.2);
-    this.shape.lineTo(0.3, 0);
+    this.shape.moveTo(-3, 0);
+    this.shape.lineTo(-5, 3);
+    this.shape.lineTo(-2, 4);
+    this.shape.lineTo(1, 6);
+    this.shape.lineTo(1, 4);
+    this.shape.lineTo(3, 2);
+    this.shape.lineTo(4, 0.5);
+    this.shape.lineTo(6, 4);
+    this.shape.lineTo(5, 0);
+    this.shape.lineTo(6, -4);
+    this.shape.lineTo(4, -0.5);
+    this.shape.lineTo(3, -2);
+    this.shape.lineTo(1, -4);
+    this.shape.lineTo(1, -6);
+    this.shape.lineTo(-2, -4);
+    this.shape.lineTo(-5, -3);
+    this.shape.lineTo(-3, 0);
 
-    this.options = { depth: 0.2, steps: 1, bevelEnabled: false};
+    this.options = { depth: 1, steps: 1, bevelEnabled: false};
     this.fishgeo = new THREE.ExtrudeGeometry(this.shape, this.options);
     this.fish = new THREE.Mesh(this.fishgeo, this.material);
+    this.fish.scale.set(0.25, 0.25, 0.25);
     this.fish.rotation.y = (90 * Math.PI) / 180;
 
     this.add(this.fish);
@@ -56,4 +63,4 @@ class Fish extends THREE.Object3D {
 
 }
 
-export { Fish }
+export { MoonFish }
