@@ -76,12 +76,14 @@ class MyScene extends THREE.Scene {
 
     this.animacion = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
       var posicion = this.tube.tubepath.getPointAt(origen.t);
-      this.penwin.position.copy(posicion);
       var tangente = this.tube.tubepath.getTangentAt(origen.t);
+      this.penwin.position.copy(posicion);
       posicion.add(tangente);
       this.penwin.up = this.binormales[Math.floor(origen.t * this.segmentos)];
       this.penwin.lookAt(posicion);
-    });
+    })
+    .repeat(Infinity)
+    .start();
 
     this.penwin.scale.set(0.5, 0.5, 0.5);
 
@@ -270,7 +272,8 @@ class MyScene extends THREE.Scene {
     
     // Se actualiza el resto del modelo
     this.penwin.update();
-    this.animacion.update();
+    //this.animacion.update();
+    TWEEN.update();
     
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
     // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".
