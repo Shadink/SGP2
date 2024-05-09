@@ -28,6 +28,7 @@ class MyScene extends THREE.Scene {
   // Recibe el  div  que se ha creado en el  html  que va a ser el lienzo en el que mostrar
   // la visualización de la escena
   constructor (myCanvas) { 
+
     super();
     
     // Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
@@ -35,9 +36,19 @@ class MyScene extends THREE.Scene {
     
     // Se crea la interfaz gráfica de usuario
     this.gui = this.createGUI ();
-    
+    this.thirdPerson = true;
+
     // Construimos los distinos elementos que tendremos en la escena
-    
+
+    // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
+    // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
+    this.tube = new Tubo(this.gui, "Controles del tubo");
+    //this.model = new Fish(this.gui, "Controles del pez");
+    this.penwin = new Penwin(this.gui, "Controles del pingu");
+    //this.model = new SeaLion(this.gui, "Controles del león marino");
+    //this.model = new Puffin(this.gui, "Controles del frailecillo");
+    //this.model = new MoonFish(this.gui, "Controles del frailecillo");
+    //this.model = new Sardine(this.gui, "Controles del frailecillo");
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
     this.createLights ();
@@ -54,18 +65,6 @@ class MyScene extends THREE.Scene {
     // Todas las unidades están en metros
     this.axis = new THREE.AxesHelper (0.1);
     this.add (this.axis);
-    
-    
-    // Por último creamos el modelo.
-    // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
-    // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    this.tube = new Tubo(this.gui, "Controles del tubo");
-    //this.model = new Fish(this.gui, "Controles del pez");
-    this.penwin = new Penwin(this.gui, "Controles del pingu");
-    //this.model = new SeaLion(this.gui, "Controles del león marino");
-    //this.model = new Puffin(this.gui, "Controles del frailecillo");
-    //this.model = new MoonFish(this.gui, "Controles del frailecillo");
-    //this.model = new Sardine(this.gui, "Controles del frailecillo");
 
     this.segmentos = 100;
     this.binormales = this.tube.tubepath.computeFrenetFrames(this.segmentos, true).binormals;
@@ -87,10 +86,38 @@ class MyScene extends THREE.Scene {
 
     this.penwin.scale.set(0.5, 0.5, 0.5);
 
+    window.addEventListener("keydown", (event) => this.onKeyDown(event));
+    
+
+
     this.add(this.penwin);
     this.add (this.tube);
+  }  
+
+  onKeyDown(event){
+    if(event.key == "c"){
+      if(this.thirdPerson){
+        this.penwin.remove(this.camera);
+        this.camera.position.set(2,2,25);
+        var look = new THREE.Vector3(0, 0, 0);
+        this.camera.lookAt(look);
+        this.add(this.camera);
+        this.thirdPerson = false;
+      }
+      else{
+        this.remove(this.camera);
+        this.penwin.add(this.camera);
+        this.camera.position.set(1,1,0);
+        var viewPoint = new THREE.Vector3(0, 0, 0);
+        var target = new THREE.Vector3();
+        this.camera.getWorldPosition(target);
+        target.add(viewPoint);
+        this.camera.lookAt(target);
+        this.thirdPerson = true;
+      }
+    }
   }
-  
+
   createCamera () {
     // Para crear una cámara le indicamos
     //   El ángulo del campo de visión vértical en grados sexagesimales
@@ -98,11 +125,22 @@ class MyScene extends THREE.Scene {
     //   Los planos de recorte cercano y lejano
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100);
     // También se indica dónde se coloca
-    this.camera.position.set (2, 0, 0);
+    
+    //Distancia
+    /*this.camera.position.set(2,2,25);
     // Y hacia dónde mira
-    var look = new THREE.Vector3 (0,0,0);
-    this.camera.lookAt(look);
-    this.add (this.camera);
+    var look = new THREE.Vector3(0, 0, 0);
+    this.camera.lookAt(look);*/
+
+    // Tercera persona
+    this.penwin.add(this.camera);
+    this.camera.position.set(1,1,0);
+    var viewPoint = new THREE.Vector3(0, 0, 0);
+    var target = new THREE.Vector3();
+    this.camera.getWorldPosition(target);
+    target.add(viewPoint);
+    this.camera.lookAt(target);
+    //this.add (this.camera);
     
     // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
     this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
@@ -112,7 +150,7 @@ class MyScene extends THREE.Scene {
     this.cameraControl.zoomSpeed = -2;
     this.cameraControl.panSpeed = 0.5;
     // Debe orbitar con respecto al punto de mira de la cámara
-    this.cameraControl.target = look;
+    //this.cameraControl.target = look;
   }
   
   createGround () {
@@ -266,6 +304,8 @@ class MyScene extends THREE.Scene {
   update () {
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());
+
+    //this.camera.position.copy(this.penwin.position);
 
     // Se actualiza la posición de la cámara según su controlador
     this.cameraControl.update();
