@@ -51,10 +51,17 @@ class MyScene extends THREE.Scene {
     //this.model = new Sardine(this.gui, "Controles del frailecillo");
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
+
+    this.penwin.scale.set(0.25, 0.25, 0.25);
+    this.penwin.position.set(0, 0.65, 0);
+    this.penwin.rotation.y = (270 * Math.PI) / 180;
+    this.createCamera ();
+
+    this.modifiedpenwin = new THREE.Scene();
+    this.modifiedpenwin.add(this.penwin);
     this.createLights ();
     
     // Tendremos una cámara con un control de movimiento con el ratón
-    this.createCamera ();
     
     // Un suelo 
     //this.createGround ();
@@ -68,7 +75,7 @@ class MyScene extends THREE.Scene {
 
     this.segmentos = 100;
     this.binormales = this.tube.tubepath.computeFrenetFrames(this.segmentos, true).binormals;
-    
+
     var origen = {t : 0};
     var fin = {t : 1};
     var tiempoDeRecorrido = 30000;
@@ -76,21 +83,18 @@ class MyScene extends THREE.Scene {
     this.animacion = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
       var posicion = this.tube.tubepath.getPointAt(origen.t);
       var tangente = this.tube.tubepath.getTangentAt(origen.t);
-      this.penwin.position.copy(posicion);
+      this.modifiedpenwin.position.copy(posicion);
       posicion.add(tangente);
-      this.penwin.up = this.binormales[Math.floor(origen.t * this.segmentos)];
-      this.penwin.lookAt(posicion);
+      this.modifiedpenwin.up = this.binormales[Math.floor(origen.t * this.segmentos)];
+      this.modifiedpenwin.lookAt(posicion);
     })
     .repeat(Infinity)
     .start();
 
-    this.penwin.scale.set(0.5, 0.5, 0.5);
 
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
-    
 
-
-    this.add(this.penwin);
+    this.add(this.modifiedpenwin);
     this.add (this.tube);
   }  
 
@@ -102,20 +106,31 @@ class MyScene extends THREE.Scene {
         var look = new THREE.Vector3(0, 0, 0);
         this.camera.lookAt(look);
         this.add(this.camera);
+        this.cameraControl.rotateSpeed = 5;
+        this.cameraControl.zoomSpeed = -2;
+        this.cameraControl.panSpeed = 0.5;
         this.thirdPerson = false;
       }
       else{
         this.remove(this.camera);
-        this.penwin.add(this.camera);
-        this.camera.position.set(1,1,0);
-        var viewPoint = new THREE.Vector3(0, 0, 0);
-        var target = new THREE.Vector3();
-        this.camera.getWorldPosition(target);
-        target.add(viewPoint);
-        this.camera.lookAt(target);
-        this.thirdPerson = true;
+        this.thirdPersonCamera();
       }
     }
+  }
+
+  thirdPersonCamera (){
+    this.penwin.add(this.camera);
+    this.camera.position.set(10,1,0);
+    this.camera.rotation.x = (45 * Math.PI) / 180;
+    var viewPoint = new THREE.Vector3(0, 1, 0);
+    var target = new THREE.Vector3();
+    this.camera.getWorldPosition(target);
+    target.add(viewPoint);
+    this.camera.lookAt(target);
+    this.thirdPerson = true;
+    this.cameraControl.rotateSpeed = 0;
+    this.cameraControl.zoomSpeed = 0;
+    this.cameraControl.panSpeed = 0;
   }
 
   createCamera () {
@@ -127,28 +142,18 @@ class MyScene extends THREE.Scene {
     // También se indica dónde se coloca
     
     //Distancia
-    /*this.camera.position.set(2,2,25);
+    /*this.camera.posction.set(2,2,25);
     // Y hacia dónde mira
     var look = new THREE.Vector3(0, 0, 0);
     this.camera.lookAt(look);*/
-
+    this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
+  
     // Tercera persona
-    this.penwin.add(this.camera);
-    this.camera.position.set(1,1,0);
-    var viewPoint = new THREE.Vector3(0, 0, 0);
-    var target = new THREE.Vector3();
-    this.camera.getWorldPosition(target);
-    target.add(viewPoint);
-    this.camera.lookAt(target);
+    this.thirdPersonCamera();
     //this.add (this.camera);
     
     // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
-    this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
-    
-    // Se configuran las velocidades de los movimientos
-    this.cameraControl.rotateSpeed = 5;
-    this.cameraControl.zoomSpeed = -2;
-    this.cameraControl.panSpeed = 0.5;
+
     // Debe orbitar con respecto al punto de mira de la cámara
     //this.cameraControl.target = look;
   }
