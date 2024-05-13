@@ -74,6 +74,7 @@ class Penwin extends THREE.Object3D {
     this.modifiedpenwin.position.set(0, 0.65, 0);
     this.modifiedpenwin.rotation.y = (270 * Math.PI) / 180;
 
+
     this.modifiedpenwin.add(this.torso);
     this.modifiedpenwin.add(this.beak);
     this.modifiedpenwin.add(this.eye);
@@ -85,7 +86,12 @@ class Penwin extends THREE.Object3D {
     this.modifiedpenwin.add(this.wing2);
     this.modifiedpenwin.add(this.camera);
 
-    this.add(this.modifiedpenwin);
+    this.modifiedpenwinz = new THREE.Scene();
+
+    this.modifiedpenwinz.add(this.modifiedpenwin)
+    this.modifiedpenwinz.rotation.z = (80 * Math.PI) / 180;
+
+    this.add(this.modifiedpenwinz);
 
   }
   
