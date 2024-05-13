@@ -63,15 +63,30 @@ class Penwin extends THREE.Object3D {
     this.foot2 = new THREE.Mesh(this.footgeo, this.orangematerial);
     this.foot2.position.set(0, -0.6, 0.2);
     
-    this.add(this.torso);
-    this.add(this.beak);
-    this.add(this.eye);
-    this.add(this.eye2);
-    this.add(this.belly);
-    this.add(this.foot);
-    this.add(this.foot2);
-    this.add(this.wing);
-    this.add(this.wing2);
+    // Camara
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100);
+    this.camera.position.set(-4,0.5,0);
+    this.camera.rotation.y = (-90 * Math.PI) / 180;
+
+    this.modifiedpenwin = new THREE.Scene();
+
+    this.modifiedpenwin.scale.set(0.25, 0.25, 0.25);
+    this.modifiedpenwin.position.set(0, 0.65, 0);
+    this.modifiedpenwin.rotation.y = (270 * Math.PI) / 180;
+
+    this.modifiedpenwin.add(this.torso);
+    this.modifiedpenwin.add(this.beak);
+    this.modifiedpenwin.add(this.eye);
+    this.modifiedpenwin.add(this.eye2);
+    this.modifiedpenwin.add(this.belly);
+    this.modifiedpenwin.add(this.foot);
+    this.modifiedpenwin.add(this.foot2);
+    this.modifiedpenwin.add(this.wing);
+    this.modifiedpenwin.add(this.wing2);
+    this.modifiedpenwin.add(this.camera);
+
+    this.add(this.modifiedpenwin);
+
   }
   
   createGUI (gui,titleGui) {
@@ -93,6 +108,10 @@ class Penwin extends THREE.Object3D {
   
   update () {
 
+  }
+
+  getCamera(){
+    return this.camera;
   }
 
 }

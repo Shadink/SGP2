@@ -46,19 +46,31 @@ class MyScene extends THREE.Scene {
     //this.model = new Fish(this.gui, "Controles del pez");
     this.penwin = new Penwin(this.gui, "Controles del pingu");
     //this.model = new SeaLion(this.gui, "Controles del león marino");
-    //this.model = new Puffin(this.gui, "Controles del frailecillo");
+    this.puffin = new Puffin(this.gui, "Controles del frailecillo");
     //this.model = new MoonFish(this.gui, "Controles del frailecillo");
     //this.model = new Sardine(this.gui, "Controles del frailecillo");
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
 
-    this.penwin.scale.set(0.25, 0.25, 0.25);
-    this.penwin.position.set(0, 0.65, 0);
-    this.penwin.rotation.y = (270 * Math.PI) / 180;
     this.createCamera ();
+    
 
-    this.modifiedpenwin = new THREE.Scene();
-    this.modifiedpenwin.add(this.penwin);
+    // Modificar los frailecillos
+    this.puffin.scale.set(0.25, 0.25, 0.25);
+    this.puffin.position.set(0, 3, 0);
+    this.puffin.rotation.z = (-45 * Math.PI) / 180;
+
+    this.modifiedpuffin = new THREE.Scene();
+    this.modifiedpuffin.add(this.puffin);
+
+    this.puffinpath_pts = [new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(4, 0, 0),
+      new THREE.Vector3(4, 2, 0),
+      new THREE.Vector3(0, 0, 4),
+      ];
+
+    this.puffinpath = new THREE.CatmullRomCurve3(this.puffinpath_pts, true);
+    // Crear las luces
     this.createLights ();
     
     // Tendremos una cámara con un control de movimiento con el ratón
@@ -73,20 +85,34 @@ class MyScene extends THREE.Scene {
     this.axis = new THREE.AxesHelper (0.1);
     this.add (this.axis);
 
+    // Definir animaciones
     this.segmentos = 100;
-    this.binormales = this.tube.tubepath.computeFrenetFrames(this.segmentos, true).binormals;
+    this.binormales_tubepath = this.tube.tubepath.computeFrenetFrames(this.segmentos, true).binormals;
 
     var origen = {t : 0};
     var fin = {t : 1};
     var tiempoDeRecorrido = 30000;
 
-    this.animacion = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
+    this.penwinAnimation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
       var posicion = this.tube.tubepath.getPointAt(origen.t);
       var tangente = this.tube.tubepath.getTangentAt(origen.t);
-      this.modifiedpenwin.position.copy(posicion);
+      this.penwin.position.copy(posicion);
       posicion.add(tangente);
-      this.modifiedpenwin.up = this.binormales[Math.floor(origen.t * this.segmentos)];
-      this.modifiedpenwin.lookAt(posicion);
+      this.penwin.up = this.binormales_tubepath[Math.floor(origen.t * this.segmentos)];
+      this.penwin.lookAt(posicion);
+    })
+    .repeat(Infinity)
+    .start();
+
+    this.binormales_puffinpath = this.puffinpath.computeFrenetFrames(this.segmentos, true).binormals;
+
+    this.puffinAnimation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
+      var posicion = this.puffinpath.getPointAt(origen.t);
+      var tangente = this.puffinpath.getTangentAt(origen.t);
+      this.modifiedpuffin.position.copy(posicion);
+      posicion.add(tangente);
+      this.modifiedpuffin.up = this.binormales_puffinpath[Math.floor(origen.t * this.segmentos)];
+      this.modifiedpuffin.lookAt(posicion);
     })
     .repeat(Infinity)
     .start();
@@ -94,43 +120,25 @@ class MyScene extends THREE.Scene {
 
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
 
-    this.add(this.modifiedpenwin);
+    this.add(this.penwin);
     this.add (this.tube);
+    this.add(this.modifiedpuffin);
+    //this.add(this.penwin.getCamera());
   }  
 
   onKeyDown(event){
-    if(event.key == "c"){
+    if(event.key == "c" || event.key == "C"){
       if(this.thirdPerson){
-        this.penwin.remove(this.camera);
-        this.camera.position.set(2,2,25);
-        var look = new THREE.Vector3(0, 0, 0);
-        this.camera.lookAt(look);
         this.add(this.camera);
-        this.cameraControl.rotateSpeed = 5;
-        this.cameraControl.zoomSpeed = -2;
-        this.cameraControl.panSpeed = 0.5;
+        this.cameraControl.enabled = true;
         this.thirdPerson = false;
       }
       else{
         this.remove(this.camera);
-        this.thirdPersonCamera();
+        this.thirdPerson = true;
+        this.cameraControl.enabled = false;
       }
     }
-  }
-
-  thirdPersonCamera (){
-    this.penwin.add(this.camera);
-    this.camera.position.set(10,1,0);
-    this.camera.rotation.x = (45 * Math.PI) / 180;
-    var viewPoint = new THREE.Vector3(0, 1, 0);
-    var target = new THREE.Vector3();
-    this.camera.getWorldPosition(target);
-    target.add(viewPoint);
-    this.camera.lookAt(target);
-    this.thirdPerson = true;
-    this.cameraControl.rotateSpeed = 0;
-    this.cameraControl.zoomSpeed = 0;
-    this.cameraControl.panSpeed = 0;
   }
 
   createCamera () {
@@ -147,9 +155,16 @@ class MyScene extends THREE.Scene {
     var look = new THREE.Vector3(0, 0, 0);
     this.camera.lookAt(look);*/
     this.cameraControl = new TrackballControls (this.camera, this.renderer.domElement);
-  
-    // Tercera persona
-    this.thirdPersonCamera();
+    this.cameraControl.rotateSpeed = 5;
+    this.cameraControl.zoomSpeed = -2;
+    this.cameraControl.panSpeed = 0.5;
+
+    this.camera.position.set(2,2,25);
+    var look = new THREE.Vector3(0, 0, 0);
+    this.camera.lookAt(look);
+
+    this.cameraControl.enabled = false;
+    this.thirdPerson = true;
     //this.add (this.camera);
     
     // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
@@ -286,7 +301,10 @@ class MyScene extends THREE.Scene {
   getCamera () {
     // En principio se devuelve la única cámara que tenemos
     // Si hubiera varias cámaras, este método decidiría qué cámara devuelve cada vez que es consultado
-    return this.camera;
+    if(this.thirdPerson)
+      return this.penwin.getCamera();
+    else
+      return this.camera;
   }
   
   setCameraAspect (ratio) {
@@ -314,12 +332,11 @@ class MyScene extends THREE.Scene {
 
     // Se actualiza la posición de la cámara según su controlador
     this.cameraControl.update();
-    
     // Se actualiza el resto del modelo
     this.penwin.update();
-    //this.animacion.update();
+    this.puffin.update();
+    //this.penwinAnimation.update();
     TWEEN.update();
-    
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
     // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".
     // Si no existiera esta línea,  update()  se ejecutaría solo la primera vez.
