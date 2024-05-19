@@ -5,6 +5,7 @@ import { CSG } from '../libs/CSG-v2.js'
 class Penwin extends THREE.Object3D {
   constructor(gui,titleGui) {
     super();
+    this.angle = 0;
     
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
@@ -89,10 +90,16 @@ class Penwin extends THREE.Object3D {
     this.modifiedpenwinz = new THREE.Scene();
 
     this.modifiedpenwinz.add(this.modifiedpenwin)
-    this.modifiedpenwinz.rotation.z = (80 * Math.PI) / 180;
+    this.modifiedpenwinz.rotation.z = (0 * Math.PI) / 180;
 
     this.add(this.modifiedpenwinz);
 
+  }
+
+  changeAngle(increment){
+    this.remove(this.modifiedpenwinz);
+    this.modifiedpenwinz.rotation.z += increment;
+    this.add(this.modifiedpenwinz);
   }
   
   createGUI (gui,titleGui) {

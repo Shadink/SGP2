@@ -30,7 +30,8 @@ class MyScene extends THREE.Scene {
   constructor (myCanvas) { 
 
     super();
-    
+    this.right = false;
+    this.left = false;
     // Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
     this.renderer = this.createRenderer(myCanvas);
     
@@ -119,6 +120,7 @@ class MyScene extends THREE.Scene {
 
 
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
+    window.addEventListener("keyup", (event) => this.onKeyUp(event));
 
     this.add(this.penwin);
     this.add (this.tube);
@@ -138,6 +140,21 @@ class MyScene extends THREE.Scene {
         this.thirdPerson = true;
         this.cameraControl.enabled = false;
       }
+    }
+    if(event.key == "a" || event.key == "A"){
+      this.left = true;
+    }
+    if(event.key == "d" || event.key == "D"){
+      this.right = true;
+    }
+  }
+
+  onKeyUp(event){
+    if(event.key == "a" || event.key == "A"){
+      this.left = false;
+    }
+    if(event.key == "d" || event.key == "D"){
+      this.right = false;
     }
   }
 
@@ -328,6 +345,10 @@ class MyScene extends THREE.Scene {
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
     this.renderer.render (this, this.getCamera());
 
+    if(this.right)
+      this.penwin.changeAngle(0.05);
+    if(this.left)
+      this.penwin.changeAngle(-0.05);
     //this.camera.position.copy(this.penwin.position);
 
     // Se actualiza la posición de la cámara según su controlador
