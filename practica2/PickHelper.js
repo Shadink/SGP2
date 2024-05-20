@@ -23,7 +23,7 @@ class PickHelper {
         // save its color
         this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
         // set its emissive color to flashing red/yellow
-        this.pickedObject.material.emissive.setHex((time * 8) % 2 > 1 ? 0xFFFF00 : 0xFF0000);
+        this.pickedObject.blackmaterial.emissive.setHex((time * 8) % 2 > 1 ? 0xFFFF00 : 0xFF0000);
       }
     }
 }

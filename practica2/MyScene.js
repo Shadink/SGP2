@@ -29,6 +29,7 @@ class MyScene extends THREE.Scene {
   constructor (myCanvas) { 
 
     super();
+    this.myCanvas = myCanvas;
     this.right = false;
     this.left = false;
     // Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
@@ -57,18 +58,18 @@ class MyScene extends THREE.Scene {
     // Picking
     const pickPosition = {x: 0, y: 0};
 
-    function getCanvasRelativePosition(event) {
-      const rect = myCanvas.getBoundingClientRect();
+    const getCanvasRelativePosition = (event) => {
+      const rect = this.myCanvas.getBoundingClientRect();
       return {
-        x: (event.clientX - rect.left) * myCanvascanvas.width  / rect.width,
-        y: (event.clientY - rect.top ) * myCanvascanvas.height / rect.height,
+        x: (event.clientX - rect.left) * this.myCanvas.width  / rect.width,
+        y: (event.clientY - rect.top ) * this.myCanvas.height / rect.height,
       };
     }
 
-    function setPickPosition(event) {
+    const setPickPosition = (event) => {
       const pos = getCanvasRelativePosition(event);
-      pickPosition.x = (pos.x / myCanvas.width ) *  2 - 1;
-      pickPosition.y = (pos.y / myCanvas.height) * -2 + 1;  // note we flip Y
+      pickPosition.x = (pos.x / this.myCanvas.width ) *  2 - 1;
+      pickPosition.y = (pos.y / this.myCanvas.height) * -2 + 1;  // note we flip Y
     }
 
     window.addEventListener('click', setPickPosition);
@@ -111,6 +112,7 @@ class MyScene extends THREE.Scene {
       new THREE.Vector3(4, 0, 0),
       new THREE.Vector3(4, 2, 0),
       new THREE.Vector3(0, 0, 4),
+      new THREE.Vector3(0, 3, 0),
       ];
 
     this.puffinpath = new THREE.CatmullRomCurve3(this.puffinpath_pts, true);
@@ -413,7 +415,7 @@ class MyScene extends THREE.Scene {
 $(function () {
   
   // Se instancia la escena pasándole el  div  que se ha creado en el html para visualizar
-  var scene = new MyScene("#WebGL-output");
+  var scene = new MyScene(document.querySelector("#WebGL-output"));
 
   // Se añaden los listener de la aplicación. En este caso, el que va a comprobar cuándo se modifica el tamaño de la ventana de la aplicación.
   window.addEventListener ("resize", () => scene.onWindowResize());
