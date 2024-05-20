@@ -16,8 +16,7 @@ import { SeaLion } from './SeaLion.js'
 import { Puffin } from './Puffin.js'
 import { MoonFish } from './MoonFish.js'
 import { Sardine } from './Sardine.js'
-
-
+import { PickHelper } from './PickHelper.js'
  
 /// La clase fachada del modelo
 /**
@@ -55,6 +54,50 @@ class MyScene extends THREE.Scene {
 
     this.createCamera ();
     
+    // Picking
+    const pickPosition = {x: 0, y: 0};
+
+    function getCanvasRelativePosition(event) {
+      const rect = myCanvascanvas.getBoundingClientRect();
+      return {
+        x: (event.clientX - rect.left) * myCanvascanvas.width  / rect.width,
+        y: (event.clientY - rect.top ) * myCanvascanvas.height / rect.height,
+      };
+    }
+
+    function setPickPosition(event) {
+      const pos = getCanvasRelativePosition(event);
+      pickPosition.x = (pos.x / myCanvascanvas.width ) *  2 - 1;
+      pickPosition.y = (pos.y / myCanvascanvas.height) * -2 + 1;  // note we flip Y
+    }
+
+    window.addEventListener('click', setPickPosition);
+
+    const pickHelper = new PickHelper();
+    pickHelper.pick(pickPosition, this.scene, this.camera, this.time);
+
+    // Colisiones
+
+    function collisionAction(object){
+      print("Colisión con: " + object);
+    }
+
+    function checkCollisions(){
+      objects = {
+        penwin: this.penwin,
+        fish: this.fish,
+        moonfish: this.moonfish,
+        sardine: this.sardine,
+        sealion: this.sealion,
+        puffin: this.puffin
+      }
+
+      for(object in objects){
+        if(this.penwin.intersectsBox(object)){
+          collisionAction(object);
+        }
+      }
+    }
 
     // Modificar los frailecillos
     this.puffin.scale.set(0.25, 0.25, 0.25);
