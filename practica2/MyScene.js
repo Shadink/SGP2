@@ -44,7 +44,7 @@ class MyScene extends THREE.Scene {
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
     this.tube = new Tubo(this.gui, "Controles del tubo");
-    //this.model = new Fish(this.gui, "Controles del pez");
+    this.fish = new Fish(this.gui, "Controles del pez");
     this.penwin = new Penwin(this.gui, "Controles del pingu");
     //this.model = new SeaLion(this.gui, "Controles del león marino");
     this.puffin = new Puffin(this.gui, "Controles del frailecillo");
@@ -56,7 +56,7 @@ class MyScene extends THREE.Scene {
     this.createCamera ();
     
     // Picking
-    const pickPosition = {x: 0, y: 0};
+    this.pickPosition = {x: 0, y: 0};
 
     const getCanvasRelativePosition = (event) => {
       const rect = this.myCanvas.getBoundingClientRect();
@@ -68,37 +68,15 @@ class MyScene extends THREE.Scene {
 
     const setPickPosition = (event) => {
       const pos = getCanvasRelativePosition(event);
-      pickPosition.x = (pos.x / this.myCanvas.width ) *  2 - 1;
-      pickPosition.y = (pos.y / this.myCanvas.height) * -2 + 1;  // note we flip Y
+      this.pickPosition.x = (pos.x / this.myCanvas.width ) *  2 - 1;
+      this.pickPosition.y = (pos.y / this.myCanvas.height) * -2 + 1;  // note we flip Y
+
     }
+    this.pickHelper = new PickHelper();
+    this.pickHelper.pick(this.pickPosition, this, this.camera, this.time);
+
 
     window.addEventListener('click', setPickPosition);
-
-    const pickHelper = new PickHelper();
-    pickHelper.pick(pickPosition, this, this.camera, this.time);
-
-    // Colisiones
-
-    function collisionAction(object){
-      print("Colisión con: " + object);
-    }
-
-    function checkCollisions(){
-      objects = {
-        penwin: this.penwin,
-        fish: this.fish,
-        moonfish: this.moonfish,
-        sardine: this.sardine,
-        sealion: this.sealion,
-        puffin: this.puffin
-      }
-
-      for(object in objects){
-        if(this.penwin.intersectsBox(object)){
-          collisionAction(object);
-        }
-      }
-    }
 
     // Modificar los frailecillos
     this.puffin.scale.set(0.25, 0.25, 0.25);
@@ -112,7 +90,6 @@ class MyScene extends THREE.Scene {
       new THREE.Vector3(4, 0, 0),
       new THREE.Vector3(4, 2, 0),
       new THREE.Vector3(0, 0, 4),
-      new THREE.Vector3(0, 3, 0),
       ];
 
     this.puffinpath = new THREE.CatmullRomCurve3(this.puffinpath_pts, true);
@@ -166,12 +143,49 @@ class MyScene extends THREE.Scene {
 
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
     window.addEventListener("keyup", (event) => this.onKeyUp(event));
+    this.objects = {
+      penwin: this.penwin,
+      fish: this.fish,
+      //moonfish: this.moonfish,
+      //sardine: this.sardine,
+      //sealion: this.sealion,
+      puffin: this.puffin
+    }
+
+    // Crear bounding boxes para los objetos
+    for (let key in this.objects) {
+      let object = this.objects[key];
+      object.boundingBox = new THREE.Box3().setFromObject(object);
+    }
 
     this.add(this.penwin);
     this.add (this.tube);
     this.add(this.modifiedpuffin);
+    this.add(this.fish);
     //this.add(this.penwin.getCamera());
+    
   }  
+
+    // Colisiones
+
+  collisionAction(object){
+    console.log("Colisión con: " + object);
+  }
+
+  checkCollisions() {
+    this.penwin.boundingBox.setFromObject(this.penwin);
+
+    for (let key in this.objects) {
+      let object = this.objects[key];
+      if (this.penwin !== object) { // No comprobar colisión con sí mismo
+        object.boundingBox.setFromObject(object);
+        if (this.penwin.boundingBox.intersectsBox(object.boundingBox)) {
+          this.collisionAction(object);
+        }
+      }
+    }
+  }
+
 
   onKeyDown(event){
     if(event.key == "c" || event.key == "C"){
@@ -401,6 +415,8 @@ class MyScene extends THREE.Scene {
     // Se actualiza el resto del modelo
     this.penwin.update();
     this.puffin.update();
+
+    this.checkCollisions();
     //this.penwinAnimation.update();
     TWEEN.update();
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
