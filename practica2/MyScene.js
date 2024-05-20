@@ -38,6 +38,7 @@ class MyScene extends THREE.Scene {
     // Se crea la interfaz gráfica de usuario
     this.gui = this.createGUI ();
     this.thirdPerson = true;
+    this.pickRequested = false;
 
     // Construimos los distinos elementos que tendremos en la escena
 
@@ -58,25 +59,12 @@ class MyScene extends THREE.Scene {
     // Picking
     this.pickPosition = {x: 0, y: 0};
 
-    const getCanvasRelativePosition = (event) => {
-      const rect = this.myCanvas.getBoundingClientRect();
-      return {
-        x: (event.clientX - rect.left) * this.myCanvas.width  / rect.width,
-        y: (event.clientY - rect.top ) * this.myCanvas.height / rect.height,
-      };
-    }
-
-    const setPickPosition = (event) => {
-      const pos = getCanvasRelativePosition(event);
-      this.pickPosition.x = (pos.x / this.myCanvas.width ) *  2 - 1;
-      this.pickPosition.y = (pos.y / this.myCanvas.height) * -2 + 1;  // note we flip Y
-
-    }
     this.pickHelper = new PickHelper();
-    this.pickHelper.pick(this.pickPosition, this, this.camera, this.time);
 
-
-    window.addEventListener('click', setPickPosition);
+    window.addEventListener('click', (event) => {
+      this.setPickPosition(event);
+      this.pickRequested = true;
+    });
 
     // Modificar los frailecillos
     this.puffin.scale.set(0.25, 0.25, 0.25);
@@ -143,6 +131,7 @@ class MyScene extends THREE.Scene {
 
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
     window.addEventListener("keyup", (event) => this.onKeyUp(event));
+
     this.objects = {
       penwin: this.penwin,
       fish: this.fish,
@@ -186,6 +175,21 @@ class MyScene extends THREE.Scene {
     }
   }
 
+  //Pick
+
+  getCanvasRelativePosition(event){
+    const rect = this.myCanvas.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) * this.myCanvas.width  / rect.width,
+      y: (event.clientY - rect.top ) * this.myCanvas.height / rect.height,
+    };
+  }
+  setPickPosition(event){
+    const pos = this.getCanvasRelativePosition(event);
+    this.pickPosition.x = (pos.x / this.myCanvas.width ) *  2 - 1;
+    this.pickPosition.y = (pos.y / this.myCanvas.height) * -2 + 1;  // note we flip Y
+
+  }
 
   onKeyDown(event){
     if(event.key == "c" || event.key == "C"){
@@ -417,6 +421,11 @@ class MyScene extends THREE.Scene {
     this.puffin.update();
 
     this.checkCollisions();
+
+    if (this.pickRequested) {
+      this.pickHelper.pick(this.pickPosition, this, this.camera);
+      this.pickRequested = false;
+    }
     //this.penwinAnimation.update();
     TWEEN.update();
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
