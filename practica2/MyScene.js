@@ -74,7 +74,7 @@ class MyScene extends THREE.Scene {
     window.addEventListener('click', setPickPosition);
 
     const pickHelper = new PickHelper();
-    pickHelper.pick(pickPosition, this.scene, this.camera, this.time);
+    pickHelper.pick(pickPosition, this, this.camera, this.time);
 
     // Colisiones
 

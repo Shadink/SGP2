@@ -1,3 +1,5 @@
+import * as THREE from 'three'
+
 class PickHelper {
     constructor() {
       this.raycaster = new THREE.Raycaster();
@@ -25,3 +27,5 @@ class PickHelper {
       }
     }
 }
+
+export { PickHelper }
