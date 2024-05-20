@@ -58,7 +58,7 @@ class MyScene extends THREE.Scene {
     const pickPosition = {x: 0, y: 0};
 
     function getCanvasRelativePosition(event) {
-      const rect = myCanvascanvas.getBoundingClientRect();
+      const rect = myCanvas.getBoundingClientRect();
       return {
         x: (event.clientX - rect.left) * myCanvascanvas.width  / rect.width,
         y: (event.clientY - rect.top ) * myCanvascanvas.height / rect.height,
@@ -67,8 +67,8 @@ class MyScene extends THREE.Scene {
 
     function setPickPosition(event) {
       const pos = getCanvasRelativePosition(event);
-      pickPosition.x = (pos.x / myCanvascanvas.width ) *  2 - 1;
-      pickPosition.y = (pos.y / myCanvascanvas.height) * -2 + 1;  // note we flip Y
+      pickPosition.x = (pos.x / myCanvas.width ) *  2 - 1;
+      pickPosition.y = (pos.y / myCanvas.height) * -2 + 1;  // note we flip Y
     }
 
     window.addEventListener('click', setPickPosition);
