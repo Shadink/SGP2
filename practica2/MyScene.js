@@ -29,6 +29,7 @@ class MyScene extends THREE.Scene {
   constructor (myCanvas) { 
 
     super();
+    this.myCanvas = myCanvas;
     this.right = false;
     this.left = false;
     // Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
@@ -37,13 +38,14 @@ class MyScene extends THREE.Scene {
     // Se crea la interfaz gráfica de usuario
     this.gui = this.createGUI ();
     this.thirdPerson = true;
+    this.pickRequested = false;
 
     // Construimos los distinos elementos que tendremos en la escena
 
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
     this.tube = new Tubo(this.gui, "Controles del tubo");
-    //this.model = new Fish(this.gui, "Controles del pez");
+    this.fish = new Fish(this.gui, "Controles del pez");
     this.penwin = new Penwin(this.gui, "Controles del pingu");
     //this.model = new SeaLion(this.gui, "Controles del león marino");
     this.puffin = new Puffin(this.gui, "Controles del frailecillo");
@@ -55,92 +57,14 @@ class MyScene extends THREE.Scene {
     this.createCamera ();
     
     // Picking
-    function getPicker(){
-      const raycaster = new THREE.Raycaster();
-      const pickedObj = null;
+    this.pickPosition = {x: 0, y: 0};
 
-      function pick(mousePos, scene, camera){
+    this.pickHelper = new PickHelper();
 
-        if(pickedObj){
-          pickedObj.highlight(false);
-          pickedObj = null;
-        }
-
-        raycaster.setFromCamera(mousePos, camera);
-
-        const intersects = raycaster.intersectObject(scene.children);
-        
-        if(intersects.length > 0){
-          pickedObj = intersects[0].object;
-          pickedObj.highlight(true);
-        }
-      }
-
-      return { pick };
-    }
-
-    Mesh.highlight = (isHighlighted) =>{
-      if(isHighlighted){
-        console.log("highlight");
-      }
-    }
-     const picker = getPicker();
-
-    function handleMouseMove(event){
-      const mousePos={
-        x: event.clientX / window.innerWidth * 2 - 1,
-        y: -(event.clientY / window.innerHeight) * 2 + 1
-      }
-
-      // NO SÉ CUÁL ES EL EQUIVALENTE DE SCENE
-      picker.pick(mousePos, scene, this.camera);
-    }
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    /*
-    const pickPosition = {x: 0, y: 0};
-
-    function getCanvasRelativePosition(event) {
-      const rect = myCanvas.getBoundingClientRect();
-      return {
-        x: (event.clientX - rect.left) * myCanvascanvas.width  / rect.width,
-        y: (event.clientY - rect.top ) * myCanvascanvas.height / rect.height,
-      };
-    }
-
-    function setPickPosition(event) {
-      const pos = getCanvasRelativePosition(event);
-      pickPosition.x = (pos.x / myCanvas.width ) *  2 - 1;
-      pickPosition.y = (pos.y / myCanvas.height) * -2 + 1;  // note we flip Y
-    }
-
-    window.addEventListener('click', setPickPosition);
-
-    const pickHelper = new PickHelper();
-    pickHelper.pick(pickPosition, this, this.camera, this.time);
-    */
-    // Colisiones
-
-    function collisionAction(object){
-      print("Colisión con: " + object);
-    }
-
-    function checkCollisions(){
-      objects = {
-        penwin: this.penwin,
-        fish: this.fish,
-        moonfish: this.moonfish,
-        sardine: this.sardine,
-        sealion: this.sealion,
-        puffin: this.puffin
-      }
-
-      for(object in objects){
-        if(this.penwin.intersectsBox(object)){
-          collisionAction(object);
-        }
-      }
-    }
+    window.addEventListener('click', (event) => {
+      this.setPickPosition(event);
+      this.pickRequested = true;
+    });
 
     // Modificar los frailecillos
     this.puffin.scale.set(0.25, 0.25, 0.25);
@@ -208,11 +132,64 @@ class MyScene extends THREE.Scene {
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
     window.addEventListener("keyup", (event) => this.onKeyUp(event));
 
+    this.objects = {
+      penwin: this.penwin,
+      fish: this.fish,
+      //moonfish: this.moonfish,
+      //sardine: this.sardine,
+      //sealion: this.sealion,
+      puffin: this.puffin
+    }
+
+    // Crear bounding boxes para los objetos
+    for (let key in this.objects) {
+      let object = this.objects[key];
+      object.boundingBox = new THREE.Box3().setFromObject(object);
+    }
+
     this.add(this.penwin);
     this.add (this.tube);
     this.add(this.modifiedpuffin);
+    this.add(this.fish);
     //this.add(this.penwin.getCamera());
+    
   }  
+
+    // Colisiones
+
+  collisionAction(object){
+    console.log("Colisión con: " + object);
+  }
+
+  checkCollisions() {
+    this.penwin.boundingBox.setFromObject(this.penwin);
+
+    for (let key in this.objects) {
+      let object = this.objects[key];
+      if (this.penwin !== object) { // No comprobar colisión con sí mismo
+        object.boundingBox.setFromObject(object);
+        if (this.penwin.boundingBox.intersectsBox(object.boundingBox)) {
+          this.collisionAction(object);
+        }
+      }
+    }
+  }
+
+  //Pick
+
+  getCanvasRelativePosition(event){
+    const rect = this.myCanvas.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) * this.myCanvas.width  / rect.width,
+      y: (event.clientY - rect.top ) * this.myCanvas.height / rect.height,
+    };
+  }
+  setPickPosition(event){
+    const pos = this.getCanvasRelativePosition(event);
+    this.pickPosition.x = (pos.x / this.myCanvas.width ) *  2 - 1;
+    this.pickPosition.y = (pos.y / this.myCanvas.height) * -2 + 1;  // note we flip Y
+
+  }
 
   onKeyDown(event){
     if(event.key == "c" || event.key == "C"){
@@ -442,6 +419,13 @@ class MyScene extends THREE.Scene {
     // Se actualiza el resto del modelo
     this.penwin.update();
     this.puffin.update();
+
+    this.checkCollisions();
+
+    if (this.pickRequested) {
+      this.pickHelper.pick(this.pickPosition, this, this.camera);
+      this.pickRequested = false;
+    }
     //this.penwinAnimation.update();
     TWEEN.update();
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
@@ -456,7 +440,7 @@ class MyScene extends THREE.Scene {
 $(function () {
   
   // Se instancia la escena pasándole el  div  que se ha creado en el html para visualizar
-  var scene = new MyScene("#WebGL-output");
+  var scene = new MyScene(document.querySelector("#WebGL-output"));
 
   // Se añaden los listener de la aplicación. En este caso, el que va a comprobar cuándo se modifica el tamaño de la ventana de la aplicación.
   window.addEventListener ("resize", () => scene.onWindowResize());
