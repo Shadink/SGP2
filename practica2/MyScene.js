@@ -57,6 +57,50 @@ class MyScene extends THREE.Scene {
     this.createCamera ();
     
     // Picking
+        function getPicker(){
+          const raycaster = new THREE.Raycaster();
+          const pickedObj = null;
+    
+          function pick(mousePos, scene, camera){
+    
+            if(pickedObj){
+              pickedObj.highlight(false);
+              pickedObj = null;
+            }
+    
+            raycaster.setFromCamera(mousePos, camera);
+    
+            const intersects = raycaster.intersectObject(scene.children);
+            
+            if(intersects.length > 0){
+              pickedObj = intersects[0].object;
+              pickedObj.highlight(true);
+            }
+          }
+    
+          return { pick };
+        }
+    
+        Mesh.highlight = (isHighlighted) =>{
+          if(isHighlighted){
+            console.log("highlight");
+          }
+        }
+         const picker = getPicker();
+    
+        function handleMouseMove(event){
+          const mousePos={
+            x: event.clientX / window.innerWidth * 2 - 1,
+            y: -(event.clientY / window.innerHeight) * 2 + 1
+          }
+    
+          // NO SÉ CUÁL ES EL EQUIVALENTE DE SCENE
+          picker.pick(mousePos, scene, this.camera);
+        }
+        
+        window.addEventListener('mousemove', handleMouseMove);
+    /*
+
     this.pickPosition = {x: 0, y: 0};
 
     this.pickHelper = new PickHelper();
@@ -65,6 +109,7 @@ class MyScene extends THREE.Scene {
       this.setPickPosition(event);
       this.pickRequested = true;
     });
+    */
 
     // Modificar los frailecillos
     this.puffin.scale.set(0.25, 0.25, 0.25);
