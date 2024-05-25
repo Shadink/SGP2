@@ -29,6 +29,7 @@ class MyScene extends THREE.Scene {
   constructor (myCanvas) { 
 
     super();
+
     this.myCanvas = myCanvas;
     this.right = false;
     this.left = false;
@@ -54,6 +55,8 @@ class MyScene extends THREE.Scene {
     this.sardine = new Sardine(this.gui, "");
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
+
+    this.createSkybox();
 
     this.createCamera ();
     
@@ -209,7 +212,17 @@ class MyScene extends THREE.Scene {
     //this.add(this.penwin.getCamera());
     
   }  
+  createSkybox() {
+    const loader = new THREE.CubeTextureLoader();
+    loader.setPath('textures/');
 
+    const textureCube = loader.load([
+      'bg.png', 'bg.png', 'bg.png', 'bg.png', 'bg.png', 'bg.png'
+    ]);
+
+    this.background = textureCube;
+  }
+  
     // Colisiones
 
   collisionAction(object){
