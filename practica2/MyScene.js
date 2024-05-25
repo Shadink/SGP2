@@ -36,7 +36,7 @@ class MyScene extends THREE.Scene {
     this.renderer = this.createRenderer(myCanvas);
     
     // Se crea la interfaz gráfica de usuario
-    this.gui = this.createGUI ();
+    //this.gui = this.createGUI ();
     this.thirdPerson = true;
     this.pickRequested = false;
 
@@ -44,72 +44,22 @@ class MyScene extends THREE.Scene {
 
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    this.tube = new Tubo(this.gui, "Controles del tubo");
-    this.fish = new Fish(this.gui, "Controles del pez");
-    this.penwin = new Penwin(this.gui, "Controles del pingu");
-    //this.model = new SeaLion(this.gui, "Controles del león marino");
-    this.puffin = new Puffin(this.gui, "Controles del frailecillo");
-    //this.model = new MoonFish(this.gui, "Controles del frailecillo");
-    //this.model = new Sardine(this.gui, "Controles del frailecillo");
+    this.tube = new Tubo(this.gui, "");
+    this.fish = new Fish(this.gui, "");
+    this.penwin = new Penwin(this.gui, "");
+    this.clion = new SeaLion(this.gui, "");
+    this.puffin = new Puffin(this.gui, "");
+    this.puffin2 = new Puffin(this.gui, "");
+    this.mfish = new MoonFish(this.gui, "");
+    this.sardine = new Sardine(this.gui, "");
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
 
     this.createCamera ();
     
-    // Picking
-        function getPicker(){
-          const raycaster = new THREE.Raycaster();
-          const pickedObj = null;
-    
-          function pick(mousePos, scene, camera){
-    
-            if(pickedObj){
-              pickedObj.highlight(false);
-              pickedObj = null;
-            }
-    
-            raycaster.setFromCamera(mousePos, camera);
-    
-            const intersects = raycaster.intersectObject(scene.children);
-            
-            if(intersects.length > 0){
-              pickedObj = intersects[0].object;
-              pickedObj.highlight(true);
-            }
-          }
-    
-          return { pick };
-        }
-    
-        Mesh.highlight = (isHighlighted) =>{
-          if(isHighlighted){
-            console.log("highlight");
-          }
-        }
-         const picker = getPicker();
-    
-        function handleMouseMove(event){
-          const mousePos={
-            x: event.clientX / window.innerWidth * 2 - 1,
-            y: -(event.clientY / window.innerHeight) * 2 + 1
-          }
-    
-          // NO SÉ CUÁL ES EL EQUIVALENTE DE SCENE
-          picker.pick(mousePos, scene, this.camera);
-        }
-        
-        window.addEventListener('mousemove', handleMouseMove);
-    /*
-
-    this.pickPosition = {x: 0, y: 0};
-
-    this.pickHelper = new PickHelper();
-
-    window.addEventListener('click', (event) => {
-      this.setPickPosition(event);
-      this.pickRequested = true;
-    });
-    */
+    // Variables picking
+    this.mouse = new THREE.Vector2();
+    this.raycaster = new THREE.Raycaster();
 
     // Modificar los frailecillos
     this.puffin.scale.set(0.25, 0.25, 0.25);
@@ -119,13 +69,52 @@ class MyScene extends THREE.Scene {
     this.modifiedpuffin = new THREE.Scene();
     this.modifiedpuffin.add(this.puffin);
 
-    this.puffinpath_pts = [new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(4, 0, 0),
-      new THREE.Vector3(4, 2, 0),
-      new THREE.Vector3(0, 0, 4),
+    this.puffin1path_pts = [
+      new THREE.Vector3(4, 3, 0),
+      new THREE.Vector3(5, 1, 1),
+      new THREE.Vector3(7, 2, 0.5),
+      new THREE.Vector3(8, 4, 2),
+      new THREE.Vector3(6, 9, -3),
+      new THREE.Vector3(5.5, 7, -5),
+      new THREE.Vector3(6, 4, -2),
+      new THREE.Vector3(-1, -2, -4),
+      new THREE.Vector3(-3, 4, -5),
+      new THREE.Vector3(-1, 5, -6),
+      new THREE.Vector3(2, 9, -6),
+      new THREE.Vector3(-1, 11, -10),
+      new THREE.Vector3(-3, 7, -10),
+      new THREE.Vector3(-3, -4, -5),
+      new THREE.Vector3(-1, -5, -2),
+      new THREE.Vector3(0, -2, 0),
       ];
 
-    this.puffinpath = new THREE.CatmullRomCurve3(this.puffinpath_pts, true);
+    this.puffin1path = new THREE.CatmullRomCurve3(this.puffin1path_pts, true);
+
+    this.puffin2.scale.set(0.5, 0.5, 0.5);
+    this.puffin2.position.set(0, 3, 0);
+    this.puffin2.rotation.z = (-45 * Math.PI) / 180;
+
+    this.modifiedpuffin2 = new THREE.Scene();
+    this.modifiedpuffin2.add(this.puffin2);
+
+    this.puffin2path_pts = [
+      new THREE.Vector3(1, 0, 0),
+      new THREE.Vector3(0, 1, 0),
+      new THREE.Vector3(2, 1, 0),
+      new THREE.Vector3(0, 0, 0),
+      ];
+
+    this.puffin2path = new THREE.CatmullRomCurve3(this.puffin2path_pts, true);
+    
+    // Poner fishes
+    this.fish.position.set(2, 0.75, 0);
+    this.fish.scale.set(0.25, 0.25, 0.25);
+
+    // Poner sealion
+    this.clion.position.set(5, 4.75, 0);
+    this.clion.rotation.y = (280 * Math.PI) / 180;
+    this.clion.rotation.x = (45 * Math.PI) / 180;
+
     // Crear las luces
     this.createLights ();
     
@@ -160,15 +149,27 @@ class MyScene extends THREE.Scene {
     .repeat(Infinity)
     .start();
 
-    this.binormales_puffinpath = this.puffinpath.computeFrenetFrames(this.segmentos, true).binormals;
+    this.binormales_puffin1path = this.puffin1path.computeFrenetFrames(this.segmentos, true).binormals;
+    this.binormales_puffin2path = this.puffin2path.computeFrenetFrames(this.segmentos, true).binormals;
 
-    this.puffinAnimation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
-      var posicion = this.puffinpath.getPointAt(origen.t);
-      var tangente = this.puffinpath.getTangentAt(origen.t);
+    this.puffin1Animation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
+      var posicion = this.puffin1path.getPointAt(origen.t);
+      var tangente = this.puffin1path.getTangentAt(origen.t);
       this.modifiedpuffin.position.copy(posicion);
       posicion.add(tangente);
-      this.modifiedpuffin.up = this.binormales_puffinpath[Math.floor(origen.t * this.segmentos)];
+      this.modifiedpuffin.up = this.binormales_puffin1path[Math.floor(origen.t * this.segmentos)];
       this.modifiedpuffin.lookAt(posicion);
+    })
+    .repeat(Infinity)
+    .start();
+
+    this.puffin2Animation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
+      var posicion = this.puffin2path.getPointAt(origen.t);
+      var tangente = this.puffin2path.getTangentAt(origen.t);
+      this.modifiedpuffin2.position.copy(posicion);
+      posicion.add(tangente);
+      this.modifiedpuffin2.up = this.binormales_puffin2path[Math.floor(origen.t * this.segmentos)];
+      this.modifiedpuffin2.lookAt(posicion);
     })
     .repeat(Infinity)
     .start();
@@ -176,15 +177,22 @@ class MyScene extends THREE.Scene {
 
     window.addEventListener("keydown", (event) => this.onKeyDown(event));
     window.addEventListener("keyup", (event) => this.onKeyUp(event));
+    window.addEventListener("mousedown", (event) => this.onDocumentMouseDown(event));
 
-    this.objects = {
-      penwin: this.penwin,
-      fish: this.fish,
+    this.objects = [
+      this.penwin,
+      this.fish,
       //moonfish: this.moonfish,
       //sardine: this.sardine,
       //sealion: this.sealion,
-      puffin: this.puffin
-    }
+      //this.puffin,
+      this.clion
+    ]
+
+    this.pickableObjects = [
+      this.puffin,
+      this.puffin2
+    ]
 
     // Crear bounding boxes para los objetos
     for (let key in this.objects) {
@@ -195,7 +203,9 @@ class MyScene extends THREE.Scene {
     this.add(this.penwin);
     this.add (this.tube);
     this.add(this.modifiedpuffin);
+    this.add(this.modifiedpuffin2);
     this.add(this.fish);
+    this.add(this.clion);
     //this.add(this.penwin.getCamera());
     
   }  
@@ -203,7 +213,10 @@ class MyScene extends THREE.Scene {
     // Colisiones
 
   collisionAction(object){
-    console.log("Colisión con: " + object);
+    if(object == this.clion)
+      console.log("Colisión con León Marino");
+    else if(object == this.fish)
+      console.log("Colisión con pez");
   }
 
   checkCollisions() {
@@ -222,7 +235,21 @@ class MyScene extends THREE.Scene {
 
   //Pick
 
-  getCanvasRelativePosition(event){
+  onDocumentMouseDown(event){
+      this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = 1 - 2 * (event.clientY / window.innerHeight);
+
+      this.raycaster.setFromCamera(this.mouse, this.getCamera());
+
+      var pickedObjects = this.raycaster.intersectObjects(this.pickableObjects, true);
+      
+      if(pickedObjects.length > 0){
+        //selectedObject = pickedObjects[0].object;
+        console.log("pick");
+      }
+  }
+
+  /*getCanvasRelativePosition(event){
     const rect = this.myCanvas.getBoundingClientRect();
     return {
       x: (event.clientX - rect.left) * this.myCanvas.width  / rect.width,
@@ -234,7 +261,7 @@ class MyScene extends THREE.Scene {
     this.pickPosition.x = (pos.x / this.myCanvas.width ) *  2 - 1;
     this.pickPosition.y = (pos.y / this.myCanvas.height) * -2 + 1;  // note we flip Y
 
-  }
+  }*/
 
   onKeyDown(event){
     if(event.key == "c" || event.key == "C"){
@@ -339,47 +366,13 @@ class MyScene extends THREE.Scene {
     this.add (wall);
   }
   
-  createGUI () {
-    // Se crea la interfaz gráfica de usuario
-    var gui = new GUI();
-    
-    // La escena le va a añadir sus propios controles. 
-    // Se definen mediante un objeto de control
-    // En este caso la intensidad de la luz y si se muestran o no los ejes
-    this.guiControls = {
-      // En el contexto de una función   this   alude a la función
-      lightPower : 100.0,  // La potencia de esta fuente de luz se mide en lúmenes
-      ambientIntensity : 0.35,
-      axisOnOff : true
-    }
-
-    // Se crea una sección para los controles de esta clase
-    var folder = gui.addFolder ('Luz y Ejes');
-    
-    // Se le añade un control para la potencia de la luz puntual
-    folder.add (this.guiControls, 'lightPower', 0, 200, 10)
-      .name('Luz puntual : ')
-      .onChange ( (value) => this.setLightPower(value) );
-    
-    // Otro para la intensidad de la luz ambiental
-    folder.add (this.guiControls, 'ambientIntensity', 0, 1, 0.05)
-      .name('Luz ambiental: ')
-      .onChange ( (value) => this.setAmbientIntensity(value) );
-      
-    // Y otro para mostrar u ocultar los ejes
-    folder.add (this.guiControls, 'axisOnOff')
-      .name ('Mostrar ejes : ')
-      .onChange ( (value) => this.setAxisVisible (value) );
-    
-    return gui;
-  }
   
   createLights () {
     // Se crea una luz ambiental, evita que se vean complentamente negras las zonas donde no incide de manera directa una fuente de luz
     // La luz ambiental solo tiene un color y una intensidad
     // Se declara como   var   y va a ser una variable local a este método
     //    se hace así puesto que no va a ser accedida desde otros métodos
-    this.ambientLight = new THREE.AmbientLight('white', this.guiControls.ambientIntensity);
+    this.ambientLight = new THREE.AmbientLight('white', 0);
     // La añadimos a la escena
     this.add (this.ambientLight);
     
@@ -388,7 +381,7 @@ class MyScene extends THREE.Scene {
     // Si no se le da punto de mira, apuntará al (0,0,0) en coordenadas del mundo
     // En este caso se declara como   this.atributo   para que sea un atributo accesible desde otros métodos.
     this.pointLight = new THREE.SpotLight( 0xffffff );
-    this.pointLight.power = this.guiControls.lightPower;
+    this.pointLight.power = 0;
     this.pointLight.position.set( 2, 1, 2 );
     this.add (this.pointLight);
   }
@@ -464,13 +457,14 @@ class MyScene extends THREE.Scene {
     // Se actualiza el resto del modelo
     this.penwin.update();
     this.puffin.update();
+    this.puffin2.update();
 
     this.checkCollisions();
 
-    if (this.pickRequested) {
+    /*if (this.pickRequested) {
       this.pickHelper.pick(this.pickPosition, this, this.camera);
       this.pickRequested = false;
-    }
+    }*/
     //this.penwinAnimation.update();
     TWEEN.update();
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.

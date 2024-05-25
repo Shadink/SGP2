@@ -6,6 +6,7 @@ class Puffin extends THREE.Object3D {
   constructor(gui,titleGui) {
     super();
     
+    this.wingsUp = false;
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     //this.createGUI(gui,titleGui);
@@ -55,17 +56,8 @@ class Puffin extends THREE.Object3D {
 
     this.options = { depth: 0.01, steps: 2, bevelEnabled: false};
     this.winggeo = new THREE.ExtrudeGeometry(this.wingshape, this.options);
-    this.wing = new THREE.Mesh(this.winggeo, this.blackmaterial);
-    this.wing.rotation.y = (-90 * Math.PI) / 180;
-    this.wing.rotation.x = (-180 * Math.PI) / 180;
-    this.wing.scale.set(0.7, 0.7, 0.7);
-    this.wing.position.set(0, 0.1, -0.1);
 
-    this.wing2 = new THREE.Mesh(this.winggeo, this.blackmaterial);
-    this.wing2.rotation.y = (90 * Math.PI) / 180;
-    this.wing2.rotation.x = (-180 * Math.PI) / 180;
-    this.wing2.scale.set(0.7, 0.7, 0.7);
-    this.wing2.position.set(0, 0.1, 0.1);   
+    this.wings = this.createWings();  
     
     // Feet
     this.footshape = new THREE.Shape();
@@ -96,11 +88,34 @@ class Puffin extends THREE.Object3D {
     this.add(this.eye2);
     this.add(this.body);
     this.add(this.neck);
-    this.add(this.wing);
-    this.add(this.wing2);
+    this.add(this.wings);
     this.add(this.foot);
     this.add(this.foot2);
+    this.rotation.y = (270 * Math.PI) / 180;
 
+  }
+
+  createWings(){
+    var wings = new THREE.Object3D();
+
+    this.wing = this.createOneWing(-1);
+    this.wing2 = this.createOneWing(1);
+
+    wings.add(this.wing);
+    wings.add(this.wing2);
+
+    return wings;
+  }
+
+  createOneWing(modifier){
+
+    var wing = new THREE.Mesh(this.winggeo, this.blackmaterial);
+    wing.rotation.y = (modifier * 90 * Math.PI) / 180;
+    wing.rotation.x = (-180 * Math.PI) / 180;
+    wing.scale.set(0.7, 0.7, 0.7);
+    wing.position.set(0, 0.1, modifier * 0.1);        
+
+    return wing;
   }
   
   createGUI (gui,titleGui) {
@@ -120,8 +135,24 @@ class Puffin extends THREE.Object3D {
     reset.add (this.guiControls, 'reset').name ('[ Reset ]');
   }
   
-  update () {
-
+  update() {
+    if (this.wingsUp) {
+      this.wing.rotation.z -= (2 * Math.PI) / 180;
+      this.wing2.rotation.z -= (2 * Math.PI) / 180;
+      this.wings.position.y += 0.01;
+      if (this.wings.position.y >= 0.2) {
+        this.wings.position.y = 0.2;
+        this.wingsUp = false;
+      }
+    } else {
+      this.wing.rotation.z += (2 * Math.PI) / 180;
+      this.wing2.rotation.z += (2 * Math.PI) / 180;
+      this.wings.position.y -= 0.01;
+      if (this.wings.position.y <= -0.2) {
+        this.wings.position.y = -0.2;
+        this.wingsUp = true;
+      }
+    }
   }
 
 }
