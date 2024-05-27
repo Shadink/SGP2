@@ -20,9 +20,11 @@ class SeaLion extends THREE.Object3D {
     furbumptexture.wrapT = THREE.RepeatWrapping;
     furbumptexture.repeat.set( 4, 4 );
 
+    this.up = false;
+
     this.blackmaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
     this.yellowmaterial = new THREE.MeshBasicMaterial( { color: 0xFFFA6B });
-    this.brownmaterial = new THREE.MeshStandardMaterial( { color : 0x572F0E, map: furtexture, bumpMap: furbumptexture });
+    this.brownmaterial = new THREE.MeshStandardMaterial( { color : 0x572F0E, map: furtexture, bumpMap: furbumptexture, bumpScale: 1 });
 
     // Head
     this.headgeo = new THREE.SphereGeometry(0.25, 20, 20);
@@ -82,22 +84,29 @@ class SeaLion extends THREE.Object3D {
     this.flipper2.rotation.x = (45 * Math.PI) / 180;
 
 
-    this.add(this.head);
-    this.add(this.torso);
-    this.add(this.snout);
-    this.add(this.nose);
-    this.add(this.eye1);
-    this.add(this.eye2);
-    this.add(this.whisker1);
-    this.add(this.whisker2);
-    this.add(this.whisker3);
-    this.add(this.whisker4);
-    this.add(this.whisker5);
-    this.add(this.whisker6);
-    this.add(this.flipper1);
-    this.add(this.flipper2);
+    this.pointlight = new THREE.PointLight(0x0033ff, 1);
+    this.pointlight.position.set(0, 1, 0);
 
-    this.scale.set(0.5, 0.5, 0.5);
+    this.modifiedclion = new THREE.Scene();
+
+    this.modifiedclion.add(this.head);
+    this.modifiedclion.add(this.torso);
+    this.modifiedclion.add(this.snout);
+    this.modifiedclion.add(this.nose);
+    this.modifiedclion.add(this.eye1);
+    this.modifiedclion.add(this.eye2);
+    this.modifiedclion.add(this.whisker1);
+    this.modifiedclion.add(this.whisker2);
+    this.modifiedclion.add(this.whisker3);
+    this.modifiedclion.add(this.whisker4);
+    this.modifiedclion.add(this.whisker5);
+    this.modifiedclion.add(this.whisker6);
+    this.modifiedclion.add(this.flipper1);
+    this.modifiedclion.add(this.flipper2);
+    this.modifiedclion.add(this.pointlight);
+
+    this.modifiedclion.scale.set(0.5, 0.5, 0.5);
+    this.add(this.modifiedclion);
 
   }
   
@@ -119,7 +128,16 @@ class SeaLion extends THREE.Object3D {
   }
   
   update () {
-
+    if(this.up){
+      this.modifiedclion.position.y -= 0.01;
+      if(this.modifiedclion.position.y <= 0)
+        this.up = false;
+    }
+    else{
+      this.modifiedclion.position.y += 0.01;
+      if(this.modifiedclion.position.y >= 1)
+        this.up = true;
+    }
   }
 
 }

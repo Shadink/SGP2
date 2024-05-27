@@ -11,10 +11,20 @@ class Puffin extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     //this.createGUI(gui,titleGui);
     
+    const feathertexture = new THREE.TextureLoader().load( "textures/feathers.jpg" );
+    feathertexture.wrapS = THREE.RepeatWrapping;
+    feathertexture.wrapT = THREE.RepeatWrapping;
+    feathertexture.repeat.set( 2, 2 );
 
-    this.blackmaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    this.orangematerial = new THREE.MeshBasicMaterial( { color: 0xEB5E34 });
-    this.whitematerial = new THREE.MeshBasicMaterial( { color : 0xFFFFFF });
+    const featherbumptexture = new THREE.TextureLoader().load( "textures/feathersbump.jpg" );
+    featherbumptexture.wrapS = THREE.RepeatWrapping;
+    featherbumptexture.wrapT = THREE.RepeatWrapping;
+    featherbumptexture.repeat.set( 2, 2 );
+
+    this.blackmaterial = new THREE.MeshStandardMaterial({ color: 0x000000, map: feathertexture, bumpMap: featherbumptexture });
+    this.orangematerial = new THREE.MeshStandardMaterial( { color: 0xEB5E34 });
+    this.whitefeathermaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, map: feathertexture, bumpMap: featherbumptexture});
+    this.whitematerial = new THREE.MeshStandardMaterial( { color : 0xFFFFFF });
 
     // Head
     this.headgeo = new THREE.SphereGeometry(0.1, 20, 20);
@@ -43,7 +53,7 @@ class Puffin extends THREE.Object3D {
 
     // Body
     this.bodygeo = new THREE.SphereGeometry(0.3, 10, 20);
-    this.body = new THREE.Mesh(this.bodygeo, this.whitematerial);
+    this.body = new THREE.Mesh(this.bodygeo, this.whitefeathermaterial);
     this.body.scale.set(0.5, 1, 0.5);
 
     // Wings
@@ -82,16 +92,25 @@ class Puffin extends THREE.Object3D {
     this.foot2.scale.set(0.5, 0.5, 0.5);
     this.foot2.position.set(0, -0.32, 0.05);
 
-    this.add(this.head);
-    this.add(this.beak);
-    this.add(this.eye);
-    this.add(this.eye2);
-    this.add(this.body);
-    this.add(this.neck);
-    this.add(this.wings);
-    this.add(this.foot);
-    this.add(this.foot2);
-    this.rotation.y = (270 * Math.PI) / 180;
+    this.modifiedpuffin = new THREE.Scene();
+
+    this.modifiedpuffin.scale.set(0.25, 0.25, 0.25);
+    this.modifiedpuffin.position.set(0, 3, 0);
+    this.modifiedpuffin.rotation.z = (-45 * Math.PI) / 180;
+    this.modifiedpuffin.rotation.y = (-90 * Math.PI) / 180;
+
+    this.modifiedpuffin.add(this.head);
+    this.modifiedpuffin.add(this.beak);
+    this.modifiedpuffin.add(this.eye);
+    this.modifiedpuffin.add(this.eye2);
+    this.modifiedpuffin.add(this.body);
+    this.modifiedpuffin.add(this.neck);
+    this.modifiedpuffin.add(this.foot2);
+    this.modifiedpuffin.add(this.wings);
+    this.modifiedpuffin.add(this.foot);
+    this.modifiedpuffin.add(this.foot2);
+
+    this.add(this.modifiedpuffin);
 
   }
 

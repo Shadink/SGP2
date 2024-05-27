@@ -8,10 +8,20 @@ class Fish extends THREE.Object3D {
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     //this.createGUI(gui,titleGui);
-    
-    this.shape = new THREE.Shape();
+    const scaletexture = new THREE.TextureLoader().load( "textures/fish_scales.jpg" );
+    scaletexture.wrapS = THREE.RepeatWrapping;
+    scaletexture.wrapT = THREE.RepeatWrapping;
+    scaletexture.repeat.set( 1, 1 );
 
-    this.material = new THREE.MeshBasicMaterial({ color: 0xA39D9B });
+    const scalebumptexture = new THREE.TextureLoader().load( "textures/fish_scalesbump.jpg" );
+    scalebumptexture.wrapS = THREE.RepeatWrapping;
+    scalebumptexture.wrapT = THREE.RepeatWrapping;
+    scalebumptexture.repeat.set( 1, 1 );
+
+    this.blackmaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    this.material = new THREE.MeshStandardMaterial({ color: 0xA39D9B, map: scaletexture, bumpMap: scalebumptexture,  bumpScale : 1});
+
+    this.shape = new THREE.Shape();
 
     this.shape.moveTo(0.3, 0);
     this.shape.lineTo(0.5,0.2);
@@ -30,7 +40,16 @@ class Fish extends THREE.Object3D {
     this.fish = new THREE.Mesh(this.fishgeo, this.material);
     this.fish.rotation.y = (90 * Math.PI) / 180;
 
+    // Little eyes
+    this.eyegeo = new THREE.SphereGeometry(0.05, 5, 5);
+    this.eye1 = new THREE.Mesh(this.eyegeo, this.blackmaterial);
+    this.eye1.position.set(0, 0.2, 0);    
+    this.eye2 = new THREE.Mesh(this.eyegeo, this.blackmaterial);
+    this.eye2.position.set(0.2, 0.2, 0); 
+
     this.add(this.fish);
+    this.add(this.eye1);
+    this.add(this.eye2);
   }
   
   createGUI (gui,titleGui) {

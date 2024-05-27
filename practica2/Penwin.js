@@ -13,9 +13,9 @@ class Penwin extends THREE.Object3D {
     
     this.hurt = false;
 
-    this.blackmaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    this.orangematerial = new THREE.MeshBasicMaterial( { color: 0xF7A80A });
-    this.whitematerial = new THREE.MeshBasicMaterial( { color : 0xFFFFFF });
+    this.blackmaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+    this.orangematerial = new THREE.MeshStandardMaterial( { color: 0xF7A80A });
+    this.whitematerial = new THREE.MeshStandardMaterial( { color : 0xFFFFFF });
 
     // Wings
     this.wingshape = new THREE.Shape();
@@ -76,7 +76,7 @@ class Penwin extends THREE.Object3D {
     this.modifiedpenwin.position.set(0, 0.65, 0);
     this.modifiedpenwin.rotation.y = (270 * Math.PI) / 180;
 
-    this.pointlight = new THREE.PointLight(0xffffff, 1);
+    this.pointlight = new THREE.PointLight(0xffffff, 0);
 
     this.modifiedpenwin.add(this.torso);
     this.modifiedpenwin.add(this.beak);
@@ -101,6 +101,14 @@ class Penwin extends THREE.Object3D {
 
     this.add(this.modifiedpenwinz);
 
+  }
+
+  turnLightOn(){
+    this.pointlight.intensity = 1;
+  }
+
+  turnLightOff(){
+    this.pointlight.intensity = 0;
   }
 
   hurtPenwin(){

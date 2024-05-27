@@ -40,7 +40,9 @@ class MyScene extends THREE.Scene {
     //this.gui = this.createGUI ();
     this.thirdPerson = true;
     this.pickRequested = false;
-
+    this.tenFishBonus = false;
+    this.fishLightCount = 0;
+    this.points = 0;
     // Construimos los distinos elementos que tendremos en la escena
 
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
@@ -64,47 +66,18 @@ class MyScene extends THREE.Scene {
     this.mouse = new THREE.Vector2();
     this.raycaster = new THREE.Raycaster();
 
-    // Modificar los frailecillos
-    this.puffin.scale.set(0.25, 0.25, 0.25);
-    this.puffin.position.set(0, 3, 0);
-    this.puffin.rotation.z = (-45 * Math.PI) / 180;
-
-    this.modifiedpuffin = new THREE.Scene();
-    this.modifiedpuffin.add(this.puffin);
-
     this.puffin1path_pts = [
-      new THREE.Vector3(4, 3, 0),
-      new THREE.Vector3(5, 1, 1),
-      new THREE.Vector3(7, 2, 0.5),
-      new THREE.Vector3(8, 4, 2),
-      new THREE.Vector3(6, 9, -3),
-      new THREE.Vector3(5.5, 7, -5),
-      new THREE.Vector3(6, 4, -2),
-      new THREE.Vector3(-1, -2, -4),
-      new THREE.Vector3(-3, 4, -5),
-      new THREE.Vector3(-1, 5, -6),
-      new THREE.Vector3(2, 9, -6),
-      new THREE.Vector3(-1, 11, -10),
-      new THREE.Vector3(-3, 7, -10),
-      new THREE.Vector3(-3, -4, -5),
-      new THREE.Vector3(-1, -5, -2),
-      new THREE.Vector3(0, -2, 0),
+      new THREE.Vector3(0, 1, 0),
+      new THREE.Vector3(-4, 0, 0),
+      new THREE.Vector3(-4, 3, -4),
       ];
 
     this.puffin1path = new THREE.CatmullRomCurve3(this.puffin1path_pts, true);
 
-    this.puffin2.scale.set(0.5, 0.5, 0.5);
-    this.puffin2.position.set(0, 3, 0);
-    this.puffin2.rotation.z = (-45 * Math.PI) / 180;
-
-    this.modifiedpuffin2 = new THREE.Scene();
-    this.modifiedpuffin2.add(this.puffin2);
-
     this.puffin2path_pts = [
-      new THREE.Vector3(1, 0, 0),
-      new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(2, 1, 0),
       new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(4, 0, 0),
+      new THREE.Vector3(4, -3, 4),
       ];
 
     this.puffin2path = new THREE.CatmullRomCurve3(this.puffin2path_pts, true);
@@ -113,8 +86,14 @@ class MyScene extends THREE.Scene {
     this.fish.position.set(2, 0.75, 0);
     this.fish.scale.set(0.25, 0.25, 0.25);
 
+    this.sardine.position.set(2, 1, 0);
+    this.sardine.scale.set(0.25, 0.25, 0.25);
+
+    this.mfish.position.set(2, 1.5, 0);
+    this.mfish.scale.set(0.25, 0.25, 0.25);
+
     // Poner sealion
-    this.clion.position.set(5, 4.75, 0);
+    this.clion.position.set(6, 1, 1.75);
     this.clion.rotation.y = (280 * Math.PI) / 180;
     this.clion.rotation.x = (45 * Math.PI) / 180;
 
@@ -130,8 +109,8 @@ class MyScene extends THREE.Scene {
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
     // Todas las unidades están en metros
-    this.axis = new THREE.AxesHelper (0.1);
-    this.add (this.axis);
+    /*this.axis = new THREE.AxesHelper (0.1);
+    this.add (this.axis);*/
 
     // Definir animaciones
     this.segmentos = 100;
@@ -158,10 +137,10 @@ class MyScene extends THREE.Scene {
     this.puffin1Animation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
       var posicion = this.puffin1path.getPointAt(origen.t);
       var tangente = this.puffin1path.getTangentAt(origen.t);
-      this.modifiedpuffin.position.copy(posicion);
+      this.puffin.position.copy(posicion);
       posicion.add(tangente);
-      this.modifiedpuffin.up = this.binormales_puffin1path[Math.floor(origen.t * this.segmentos)];
-      this.modifiedpuffin.lookAt(posicion);
+      this.puffin.up = this.binormales_puffin1path[Math.floor(origen.t * this.segmentos)];
+      this.puffin.lookAt(posicion);
     })
     .repeat(Infinity)
     .start();
@@ -169,10 +148,10 @@ class MyScene extends THREE.Scene {
     this.puffin2Animation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
       var posicion = this.puffin2path.getPointAt(origen.t);
       var tangente = this.puffin2path.getTangentAt(origen.t);
-      this.modifiedpuffin2.position.copy(posicion);
+      this.puffin2.position.copy(posicion);
       posicion.add(tangente);
-      this.modifiedpuffin2.up = this.binormales_puffin2path[Math.floor(origen.t * this.segmentos)];
-      this.modifiedpuffin2.lookAt(posicion);
+      this.puffin2.up = this.binormales_puffin2path[Math.floor(origen.t * this.segmentos)];
+      this.puffin2.lookAt(posicion);
     })
     .repeat(Infinity)
     .start();
@@ -185,8 +164,8 @@ class MyScene extends THREE.Scene {
     this.objects = [
       this.penwin,
       this.fish,
-      //moonfish: this.moonfish,
-      //sardine: this.sardine,
+      this.mfish,
+      this.sardine,
       //sealion: this.sealion,
       //this.puffin,
       this.clion
@@ -205,10 +184,12 @@ class MyScene extends THREE.Scene {
 
     this.add(this.penwin);
     this.add (this.tube);
-    this.add(this.modifiedpuffin);
-    this.add(this.modifiedpuffin2);
+    this.add(this.puffin);
+    this.add(this.puffin2);
     this.add(this.fish);
     this.add(this.clion);
+    this.add(this.sardine);
+    this.add(this.mfish);
     //this.add(this.penwin.getCamera());
     
   }  
@@ -217,7 +198,14 @@ class MyScene extends THREE.Scene {
     loader.setPath('textures/');
 
     const textureCube = loader.load([
-      'bg.png', 'bg.png', 'bg.png', 'bg.png', 'bg.png', 'bg.png'
+      'bg-side1.png', 'bg-side2.png',
+
+      //Arriba
+      'bg-sky.png', 
+      //Abajo
+      'bg-water.png',
+
+      'bg-side1.png', 'bg-side2.png'
     ]);
 
     this.background = textureCube;
@@ -231,8 +219,15 @@ class MyScene extends THREE.Scene {
         this.penwin.hurtPenwin();
       console.log("Colisión con León Marino");
     }
-    else if(object == this.fish)
+    else if(object == this.fish){
+      this.points += 1;
+      console.log(this.points);
+      if(this.points >= 6){
+        this.tenFishBonus = true;
+        this.penwin.turnLightOn();
+      }
       console.log("Colisión con pez");
+    }
   }
 
   checkCollisions() {
@@ -472,6 +467,16 @@ class MyScene extends THREE.Scene {
     this.penwin.update();
     this.puffin.update();
     this.puffin2.update();
+    this.clion.update();
+
+    if(this.tenFishBonus){
+      this.fishLightCount += 1;
+      if(this.fishLightCount >= 500){
+        this.fishLightCount = 0;
+        this.penwin.turnLightOff();
+        this.tenFishBonus = false;
+      }
+    }
 
     this.checkCollisions();
 
