@@ -10,10 +10,19 @@ class SeaLion extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     //this.createGUI(gui,titleGui);
     
+    const furtexture = new THREE.TextureLoader().load( "textures/fur.jpg" );
+    furtexture.wrapS = THREE.RepeatWrapping;
+    furtexture.wrapT = THREE.RepeatWrapping;
+    furtexture.repeat.set( 4, 4 );
+
+    const furbumptexture = new THREE.TextureLoader().load( "textures/furbump.jpg" );
+    furbumptexture.wrapS = THREE.RepeatWrapping;
+    furbumptexture.wrapT = THREE.RepeatWrapping;
+    furbumptexture.repeat.set( 4, 4 );
 
     this.blackmaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
     this.yellowmaterial = new THREE.MeshBasicMaterial( { color: 0xFFFA6B });
-    this.brownmaterial = new THREE.MeshBasicMaterial( { color : 0x572F0E });
+    this.brownmaterial = new THREE.MeshStandardMaterial( { color : 0x572F0E, map: furtexture, bumpMap: furbumptexture });
 
     // Head
     this.headgeo = new THREE.SphereGeometry(0.25, 20, 20);
@@ -88,6 +97,7 @@ class SeaLion extends THREE.Object3D {
     this.add(this.flipper1);
     this.add(this.flipper2);
 
+    this.scale.set(0.5, 0.5, 0.5);
 
   }
   

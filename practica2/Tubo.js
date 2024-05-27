@@ -11,8 +11,18 @@ class Tubo extends THREE.Object3D {
     
     this.circle = new THREE.Shape();
 
+    const icetexture = new THREE.TextureLoader().load( "textures/ice.jpg" );
+    icetexture.wrapS = THREE.RepeatWrapping;
+    icetexture.wrapT = THREE.RepeatWrapping;
+    icetexture.repeat.set( 50, 4 );
+
+    const icebumptexture = new THREE.TextureLoader().load( "textures/icebump.jpg" );
+    icebumptexture.wrapS = THREE.RepeatWrapping;
+    icebumptexture.wrapT = THREE.RepeatWrapping;
+    icebumptexture.repeat.set( 50, 4 );
+
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-    this.material = new THREE.MeshNormalMaterial();
+    this.material = new THREE.MeshStandardMaterial({ color: 0xCDF1F7, map: icetexture, bumpMap: icebumptexture, bumpScale: 1, transparent: true, opacity: 0.9});
 
     this.pts = [new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(2, 0, 0),

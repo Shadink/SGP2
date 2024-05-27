@@ -226,8 +226,11 @@ class MyScene extends THREE.Scene {
     // Colisiones
 
   collisionAction(object){
-    if(object == this.clion)
+    if(object == this.clion){
+      if(!this.penwin.isHurt())
+        this.penwin.hurtPenwin();
       console.log("Colisión con León Marino");
+    }
     else if(object == this.fish)
       console.log("Colisión con pez");
   }
@@ -385,18 +388,16 @@ class MyScene extends THREE.Scene {
     // La luz ambiental solo tiene un color y una intensidad
     // Se declara como   var   y va a ser una variable local a este método
     //    se hace así puesto que no va a ser accedida desde otros métodos
-    this.ambientLight = new THREE.AmbientLight('white', 0);
-    // La añadimos a la escena
+    this.ambientLight = new THREE.AmbientLight(0xf0bdc5, 2);
     this.add (this.ambientLight);
     
     // Se crea una luz focal que va a ser la luz principal de la escena
     // La luz focal, además tiene una posición, y un punto de mira
     // Si no se le da punto de mira, apuntará al (0,0,0) en coordenadas del mundo
     // En este caso se declara como   this.atributo   para que sea un atributo accesible desde otros métodos.
-    this.pointLight = new THREE.SpotLight( 0xffffff );
-    this.pointLight.power = 0;
-    this.pointLight.position.set( 2, 1, 2 );
-    this.add (this.pointLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(1, 1, 1).normalize();
+    this.add(directionalLight);
   }
   
   setLightPower (valor) {

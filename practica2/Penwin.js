@@ -11,6 +11,7 @@ class Penwin extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     //this.createGUI(gui,titleGui);
     
+    this.hurt = false;
 
     this.blackmaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
     this.orangematerial = new THREE.MeshBasicMaterial( { color: 0xF7A80A });
@@ -66,8 +67,8 @@ class Penwin extends THREE.Object3D {
     
     // Camara
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100);
-    this.camera.position.set(-4,0.5,0);
-    this.camera.rotation.y = (-90 * Math.PI) / 180;
+    this.camera.position.set(0,0.8,-1.25);
+    this.camera.rotation.y = (-180 * Math.PI) / 180;
 
     this.modifiedpenwin = new THREE.Scene();
 
@@ -75,6 +76,7 @@ class Penwin extends THREE.Object3D {
     this.modifiedpenwin.position.set(0, 0.65, 0);
     this.modifiedpenwin.rotation.y = (270 * Math.PI) / 180;
 
+    this.pointlight = new THREE.PointLight(0xffffff, 1);
 
     this.modifiedpenwin.add(this.torso);
     this.modifiedpenwin.add(this.beak);
@@ -85,15 +87,28 @@ class Penwin extends THREE.Object3D {
     this.modifiedpenwin.add(this.foot2);
     this.modifiedpenwin.add(this.wing);
     this.modifiedpenwin.add(this.wing2);
-    this.modifiedpenwin.add(this.camera);
+    this.modifiedpenwin.add(this.pointlight);
+
+    this.modifiedpenwinwcam = new THREE.Scene();
+
+    this.modifiedpenwinwcam.add(this.modifiedpenwin);
+    this.modifiedpenwinwcam.add(this.camera);
 
     this.modifiedpenwinz = new THREE.Scene();
 
-    this.modifiedpenwinz.add(this.modifiedpenwin)
+    this.modifiedpenwinz.add(this.modifiedpenwinwcam)
     this.modifiedpenwinz.rotation.z = (0 * Math.PI) / 180;
 
     this.add(this.modifiedpenwinz);
 
+  }
+
+  hurtPenwin(){
+    this.hurt = true;
+  }
+
+  isHurt(){
+    return this.hurt;
   }
 
   changeAngle(increment){
@@ -120,7 +135,13 @@ class Penwin extends THREE.Object3D {
   }
   
   update () {
-
+    if(this.hurt){
+      this.modifiedpenwin.rotation.y += (4 * Math.PI) / 180;
+      if(this.modifiedpenwin.rotation.y >= (630*Math.PI)/180){
+        this.hurt = false;
+        this.modifiedpenwin.rotation.y = (270*Math.PI)/180;
+      }
+    }
   }
 
   getCamera(){
