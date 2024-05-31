@@ -7,6 +7,7 @@ class Penwin extends THREE.Object3D {
     super();
     this.angle = 0;
     
+    this.footMovingUp = true;
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     //this.createGUI(gui,titleGui);
@@ -150,6 +151,21 @@ class Penwin extends THREE.Object3D {
         this.modifiedpenwin.rotation.y = (270*Math.PI)/180;
       }
     }
+    
+    if(this.footMovingUp){
+      this.foot.position.y += 0.01;
+      this.foot2.position.y -= 0.01;
+      if(this.foot.position.y >= -0.55){
+        this.footMovingUp = false;
+      }
+    } else {
+      this.foot.position.y -= 0.01;
+      this.foot2.position.y += 0.01;
+      if(this.foot.position.y <= -0.65){
+        this.footMovingUp = true;
+      }
+    }
+
   }
 
   getCamera(){

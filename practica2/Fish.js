@@ -4,6 +4,8 @@ import * as THREE from 'three'
 class Fish extends THREE.Object3D {
   constructor(gui,titleGui) {
     super();
+
+    this.collided = false;
     
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz

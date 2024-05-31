@@ -42,7 +42,14 @@ class MyScene extends THREE.Scene {
     this.pickRequested = false;
     this.tenFishBonus = false;
     this.fishLightCount = 0;
+
+    // Puntos
     this.points = 0;
+    this.pointsDisplay = document.getElementById('points-display');
+
+    // Vueltas
+    this.laps = 0;
+    this.lapsDisplay = document.getElementById('laps-display');
     // Construimos los distinos elementos que tendremos en la escena
 
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
@@ -86,11 +93,12 @@ class MyScene extends THREE.Scene {
     this.fish.position.set(2, 0.75, 0);
     this.fish.scale.set(0.25, 0.25, 0.25);
 
-    this.sardine.position.set(2, 1, 0);
+    this.sardine.position.set(5, 0, 1);
     this.sardine.scale.set(0.25, 0.25, 0.25);
 
-    this.mfish.position.set(2, 1.5, 0);
+    this.mfish.position.set(4, 7, -3);
     this.mfish.scale.set(0.25, 0.25, 0.25);
+    this.mfish.rotation.y = (90 * Math.PI) / 180;
 
     // Poner sealion
     this.clion.position.set(6, 1, 1.75);
@@ -116,41 +124,34 @@ class MyScene extends THREE.Scene {
     this.segmentos = 100;
     this.binormales_tubepath = this.tube.tubepath.computeFrenetFrames(this.segmentos, true).binormals;
 
-    var origen = {t : 0};
-    var fin = {t : 1};
-    var tiempoDeRecorrido = 30000;
+    this.origen = {t : 0};
+    this.fin = {t : 1};
+    this.penwinTiempoDeRecorrido = 30000;
 
-    this.penwinAnimation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
-      var posicion = this.tube.tubepath.getPointAt(origen.t);
-      var tangente = this.tube.tubepath.getTangentAt(origen.t);
-      this.penwin.position.copy(posicion);
-      posicion.add(tangente);
-      this.penwin.up = this.binormales_tubepath[Math.floor(origen.t * this.segmentos)];
-      this.penwin.lookAt(posicion);
-    })
-    .repeat(Infinity)
-    .start();
+    this.createPenwinAnimation();
 
     this.binormales_puffin1path = this.puffin1path.computeFrenetFrames(this.segmentos, true).binormals;
     this.binormales_puffin2path = this.puffin2path.computeFrenetFrames(this.segmentos, true).binormals;
 
-    this.puffin1Animation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
-      var posicion = this.puffin1path.getPointAt(origen.t);
-      var tangente = this.puffin1path.getTangentAt(origen.t);
+    this.puffinTiempoDeRecorrido = 30000;
+
+    this.puffin1Animation = new TWEEN.Tween(this.origen).to(this.fin, this.puffinTiempoDeRecorrido) .onUpdate(() => {
+      var posicion = this.puffin1path.getPointAt(this.origen.t);
+      var tangente = this.puffin1path.getTangentAt(this.origen.t);
       this.puffin.position.copy(posicion);
       posicion.add(tangente);
-      this.puffin.up = this.binormales_puffin1path[Math.floor(origen.t * this.segmentos)];
+      this.puffin.up = this.binormales_puffin1path[Math.floor(this.origen.t * this.segmentos)];
       this.puffin.lookAt(posicion);
     })
     .repeat(Infinity)
     .start();
 
-    this.puffin2Animation = new TWEEN.Tween(origen).to(fin, tiempoDeRecorrido) .onUpdate(() => {
-      var posicion = this.puffin2path.getPointAt(origen.t);
-      var tangente = this.puffin2path.getTangentAt(origen.t);
+    this.puffin2Animation = new TWEEN.Tween(this.origen).to(this.fin, this.puffinTiempoDeRecorrido) .onUpdate(() => {
+      var posicion = this.puffin2path.getPointAt(this.origen.t);
+      var tangente = this.puffin2path.getTangentAt(this.origen.t);
       this.puffin2.position.copy(posicion);
       posicion.add(tangente);
-      this.puffin2.up = this.binormales_puffin2path[Math.floor(origen.t * this.segmentos)];
+      this.puffin2.up = this.binormales_puffin2path[Math.floor(this.origen.t * this.segmentos)];
       this.puffin2.lookAt(posicion);
     })
     .repeat(Infinity)
@@ -166,7 +167,6 @@ class MyScene extends THREE.Scene {
       this.fish,
       this.mfish,
       this.sardine,
-      //sealion: this.sealion,
       //this.puffin,
       this.clion
     ]
@@ -210,23 +210,65 @@ class MyScene extends THREE.Scene {
 
     this.background = textureCube;
   }
+
+    // Animation
+
+    createPenwinAnimation(){
+      this.penwinAnimation = new TWEEN.Tween(this.origen).to(this.fin, this.penwinTiempoDeRecorrido) .onUpdate(() => {
+        var posicion = this.tube.tubepath.getPointAt(this.origen.t);
+        var tangente = this.tube.tubepath.getTangentAt(this.origen.t);
+        this.penwin.position.copy(posicion);
+        posicion.add(tangente);
+        this.penwin.up = this.binormales_tubepath[Math.floor(this.origen.t * this.segmentos)];
+        this.penwin.lookAt(posicion);
+      })
+      .repeat(Infinity)
+      .onRepeat(() => {
+        this.penwinTiempoDeRecorrido *= 0.9;
+        this.laps+=1;
+        this.lapsDisplay.textContent = `Vueltas: ${this.laps}`;
+        this.penwinAnimation.duration(this.penwinTiempoDeRecorrido); // Actualizar la duración de la animación existente
+      })
+      .start();
+    }
   
     // Colisiones
 
   collisionAction(object){
-    if(object == this.clion){
-      if(!this.penwin.isHurt())
-        this.penwin.hurtPenwin();
-      console.log("Colisión con León Marino");
+    switch(object){
+      case(this.clion):
+        if(!this.penwin.isHurt()){
+          this.penwin.hurtPenwin();
+          this.updatePoints(-2);
+        }
+        break;
+      case(this.fish):
+        this.anadirPuntos(2, object);
+        break;
+      case(this.sardine):
+        this.anadirPuntos(1, object);
+      case(this.mfish):
+        this.anadirPuntos(3, object);
     }
-    else if(object == this.fish){
-      this.points += 1;
+  }
+
+  updatePoints(nPoints){
+    this.points += nPoints;
+    if(this.points < 0)
+      this.points = 0;
+    this.pointsDisplay.textContent = `Puntos: ${this.points}`;
+  }
+
+  anadirPuntos(nPoints, object){
+    if (!object.collided) {
+      this.updatePoints(nPoints);
       console.log(this.points);
-      if(this.points >= 6){
+      if (this.points >= 10) {
         this.tenFishBonus = true;
         this.penwin.turnLightOn();
       }
-      console.log("Colisión con pez");
+      object.collided = true;
+      this.remove(object);
     }
   }
 
@@ -256,7 +298,7 @@ class MyScene extends THREE.Scene {
       
       if(pickedObjects.length > 0){
         //selectedObject = pickedObjects[0].object;
-        console.log("pick");
+        this.updatePoints(3);
       }
   }
 
@@ -349,7 +391,7 @@ class MyScene extends THREE.Scene {
     // Ya se puede construir el Mesh
     var ground = new THREE.Mesh (geometryGround, materialGround);
     
-    // Todas las figuras se crean centradas en el origen.
+    // Todas las figuras se crean centradas en el this.origen.
     // El suelo lo bajamos la mitad de su altura para que el origen del mundo se quede en su lado superior
     ground.position.y = -0.01;
     
