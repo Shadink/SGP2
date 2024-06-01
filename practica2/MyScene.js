@@ -30,6 +30,18 @@ class MyScene extends THREE.Scene {
 
     super();
 
+    // Puntos
+    this.CLION_PTS = -50;
+    this.FISH_PTS = 20;
+    this.SARDINE_PTS = 10;
+    this.MFISH_PTS = 50;
+    this.PUFFIN_PTS = 100;
+
+    // Power
+    this.FISH_POWER = 2;
+    this.SARDINE_POWER = 5;
+    this.MFISH_POWER = 1;
+
     this.myCanvas = myCanvas;
     this.right = false;
     this.left = false;
@@ -40,12 +52,16 @@ class MyScene extends THREE.Scene {
     //this.gui = this.createGUI ();
     this.thirdPerson = true;
     this.pickRequested = false;
-    this.tenFishBonus = false;
+    this.isPowerActive = false;
     this.fishLightCount = 0;
 
     // Puntos
     this.points = 0;
     this.pointsDisplay = document.getElementById('points-display');
+
+    // Poder
+    this.power = 0;
+    this.powerDisplay = document.getElementById('power-display');
 
     // Vueltas
     this.laps = 0;
@@ -238,18 +254,29 @@ class MyScene extends THREE.Scene {
     switch(object){
       case(this.clion):
         if(!this.penwin.isHurt()){
+          this.penwinAnimation.duration(this.penwinTiempoDeRecorrido * 1.5);
           this.penwin.hurtPenwin();
-          this.updatePoints(-2);
+          this.updatePoints(this.CLION_PTS);
         }
         break;
       case(this.fish):
-        this.anadirPuntos(2, object);
+        this.anadirPuntos(this.FISH_PTS, object, this.FISH_POWER);
         break;
       case(this.sardine):
-        this.anadirPuntos(1, object);
+        this.anadirPuntos(this.SARDINE_PTS, object, this.SARDINE_POWER);
       case(this.mfish):
-        this.anadirPuntos(3, object);
+        this.anadirPuntos(this.MFISH_PTS, object, this.MFISH_POWER);
     }
+  }
+
+  updatePower(nPower){
+    this.power += nPower;
+    if(this.power > 10){
+      this.power = 10;
+      this.isPowerActive = true;
+      this.penwin.turnLightOn();
+    }
+    this.powerDisplay.textContent = `POWER: ${this.power}`;
   }
 
   updatePoints(nPoints){
@@ -259,14 +286,11 @@ class MyScene extends THREE.Scene {
     this.pointsDisplay.textContent = `Puntos: ${this.points}`;
   }
 
-  anadirPuntos(nPoints, object){
+  anadirPuntos(nPoints, object, power){
     if (!object.collided) {
       this.updatePoints(nPoints);
+      this.updatePower(power);
       console.log(this.points);
-      if (this.points >= 10) {
-        this.tenFishBonus = true;
-        this.penwin.turnLightOn();
-      }
       object.collided = true;
       this.remove(object);
     }
@@ -298,7 +322,7 @@ class MyScene extends THREE.Scene {
       
       if(pickedObjects.length > 0){
         //selectedObject = pickedObjects[0].object;
-        this.updatePoints(3);
+        this.updatePoints(this.PUFFIN_PTS);
       }
   }
 
@@ -511,12 +535,16 @@ class MyScene extends THREE.Scene {
     this.puffin2.update();
     this.clion.update();
 
-    if(this.tenFishBonus){
+    if(this.isPowerActive){
       this.fishLightCount += 1;
-      if(this.fishLightCount >= 500){
+      if(this.fishLightCount == 50){
+        this.power -= 1;
+        this.powerDisplay.textContent = `POWER: ${this.power}`;
+        if(this.power == 0){
+          this.isPowerActive = false;
+          this.penwin.turnLightOff();
+        }
         this.fishLightCount = 0;
-        this.penwin.turnLightOff();
-        this.tenFishBonus = false;
       }
     }
 
