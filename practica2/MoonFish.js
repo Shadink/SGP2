@@ -4,6 +4,8 @@ import * as THREE from 'three'
 class MoonFish extends THREE.Object3D {
   constructor(gui,titleGui) {
     super();
+
+    this.collided = false;
     
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
@@ -78,7 +80,7 @@ class MoonFish extends THREE.Object3D {
   }
   
   update () {
-
+    this.rotation.y += (1 * Math.PI) / 180;
   }
 
 }

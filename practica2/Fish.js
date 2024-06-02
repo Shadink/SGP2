@@ -72,7 +72,7 @@ class Fish extends THREE.Object3D {
   }
   
   update () {
-
+    this.rotation.y += (1 * Math.PI) / 180;
   }
 
 }

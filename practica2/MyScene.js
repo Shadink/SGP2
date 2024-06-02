@@ -72,12 +72,21 @@ class MyScene extends THREE.Scene {
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
     this.tube = new Tubo(this.gui, "");
     this.fish = new Fish(this.gui, "");
+    this.fish2 = new Fish(this.gui, "");
+    this.fish3 = new Fish(this.gui, "");
+    this.fish4 = new Fish(this.gui, "");
+    this.fish5 = new Fish(this.gui, "");
     this.penwin = new Penwin(this.gui, "");
     this.clion = new SeaLion(this.gui, "");
+    this.clion2 = new SeaLion(this.gui, "");
+    this.clion3 = new SeaLion(this.gui, "");
     this.puffin = new Puffin(this.gui, "");
     this.puffin2 = new Puffin(this.gui, "");
     this.mfish = new MoonFish(this.gui, "");
+    this.mfish2 = new MoonFish(this.gui, "");
+    this.mfish3 = new MoonFish(this.gui, "");
     this.sardine = new Sardine(this.gui, "");
+    this.sardine2 = new Sardine(this.gui, "");
     // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
 
@@ -109,17 +118,50 @@ class MyScene extends THREE.Scene {
     this.fish.position.set(2, 0.75, 0);
     this.fish.scale.set(0.25, 0.25, 0.25);
 
+    this.fish2.position.set(4, 1, -1.25);
+    this.fish2.rotation.x = (90 * Math.PI) / 180;
+    this.fish2.scale.set(0.25, 0.25, 0.25);
+
+    this.fish3.position.set(-5, 1, -6);
+    this.fish3.rotation.x = (-90 * Math.PI) / 180;
+    this.fish3.scale.set(0.25, 0.25, 0.25);
+
+    this.fish4.position.set(-5, 0, -9.5);
+    this.fish4.rotation.x = (-135 * Math.PI) / 180;
+    this.fish4.scale.set(0.25, 0.25, 0.25);
+
+    this.fish5.position.set(-5, -6, -5);
+    this.fish5.rotation.x = (-135 * Math.PI) / 180;
+    this.fish5.rotation.z = (180 * Math.PI) / 180;
+    this.fish5.scale.set(0.25, 0.25, 0.25);
+
     this.sardine.position.set(5, 0, 1);
     this.sardine.scale.set(0.25, 0.25, 0.25);
+
+    this.sardine2.position.set(-3, 7, -10);
+    this.sardine2.rotation.x = (-90 * Math.PI) / 180;
+    this.sardine2.scale.set(0.25, 0.25, 0.25);
 
     this.mfish.position.set(4, 7, -3);
     this.mfish.scale.set(0.25, 0.25, 0.25);
     this.mfish.rotation.y = (90 * Math.PI) / 180;
 
-    // Poner sealion
-    this.clion.position.set(6, 1, 1.75);
+    this.mfish2.position.set(-3, -4, -4);
+    this.mfish2.scale.set(0.25, 0.25, 0.25);
+
+    this.mfish3.position.set(-0.5, 7.75, -6.75);
+    this.mfish3.scale.set(0.25, 0.25, 0.25);
+    // Poner sealions
+    this.clion.position.set(6, 1.15, 1.75);
     this.clion.rotation.y = (280 * Math.PI) / 180;
     this.clion.rotation.x = (45 * Math.PI) / 180;
+
+    this.clion2.position.set(0, 5.75, -6);
+    this.clion2.rotation.y = (280 * Math.PI) / 180;
+
+    this.clion3.position.set(-3, -7.8, -2);
+    this.clion3.rotation.x = (180 * Math.PI) / 180;
+    this.clion3.rotation.y = (225 * Math.PI) / 180;
 
     // Crear las luces
     this.createLights ();
@@ -181,10 +223,32 @@ class MyScene extends THREE.Scene {
     this.objects = [
       this.penwin,
       this.fish,
+      this.fish2,
+      this.fish3,
+      this.fish4,
+      this.fish5,
       this.mfish,
+      this.mfish2,
+      this.mfish3,
       this.sardine,
+      this.sardine2,
       //this.puffin,
-      this.clion
+      this.clion,
+      this.clion2,
+      this.clion3
+    ]
+
+    this.fishList = [
+      this.fish,
+      this.fish2,
+      this.fish3,
+      this.fish4,
+      this.fish5,
+      this.mfish,
+      this.mfish2,
+      this.mfish3,
+      this.sardine,
+      this.sardine2
     ]
 
     this.pickableObjects = [
@@ -203,9 +267,18 @@ class MyScene extends THREE.Scene {
     this.add(this.puffin);
     this.add(this.puffin2);
     this.add(this.fish);
+    this.add(this.fish2);
+    this.add(this.fish3);
+    this.add(this.fish4);
+    this.add(this.fish5);
     this.add(this.clion);
+    this.add(this.clion2);
+    this.add(this.clion3);
     this.add(this.sardine);
+    this.add(this.sardine2);
+    this.add(this.mfish3);
     this.add(this.mfish);
+    this.add(this.mfish2);
     //this.add(this.penwin.getCamera());
     
   }  
@@ -240,6 +313,7 @@ class MyScene extends THREE.Scene {
       })
       .repeat(Infinity)
       .onRepeat(() => {
+        this.respawnFish();
         this.penwinTiempoDeRecorrido *= 0.9;
         this.laps+=1;
         this.lapsDisplay.textContent = `Vueltas: ${this.laps}`;
@@ -248,30 +322,40 @@ class MyScene extends THREE.Scene {
       .start();
     }
   
+    respawnFish(){
+      for(let key in this.fishList){
+        let object = this.objects[key];
+        if(object.collided){
+          this.add(object);
+          object.collided = false;
+        }
+      }
+    }
+
     // Colisiones
 
   collisionAction(object){
-    switch(object){
-      case(this.clion):
-        if(!this.penwin.isHurt()){
-          this.penwinAnimation.duration(this.penwinTiempoDeRecorrido * 1.5);
+    switch(object.constructor.name){
+      case('SeaLion'):
+        if(!this.penwin.isHurt() && !this.isPowerActive){
+          //this.penwinAnimation.duration(this.penwinTiempoDeRecorrido * 1.5);
           this.penwin.hurtPenwin();
           this.updatePoints(this.CLION_PTS);
         }
         break;
-      case(this.fish):
+      case('Fish'):
         this.anadirPuntos(this.FISH_PTS, object, this.FISH_POWER);
         break;
-      case(this.sardine):
+      case('Sardine'):
         this.anadirPuntos(this.SARDINE_PTS, object, this.SARDINE_POWER);
-      case(this.mfish):
+      case('MoonFish'):
         this.anadirPuntos(this.MFISH_PTS, object, this.MFISH_POWER);
     }
   }
 
   updatePower(nPower){
     this.power += nPower;
-    if(this.power > 10){
+    if(this.power >= 10){
       this.power = 10;
       this.isPowerActive = true;
       this.penwin.turnLightOn();
@@ -534,6 +618,18 @@ class MyScene extends THREE.Scene {
     this.puffin.update();
     this.puffin2.update();
     this.clion.update();
+    this.clion2.update();
+    this.clion3.update();
+    this.fish.update();
+    this.fish2.update();
+    this.fish3.update();
+    this.fish4.update();
+    this.fish5.update();
+    this.mfish.update();
+    this.mfish2.update();
+    this.mfish3.update();
+    this.sardine.update();
+    this.sardine2.update();
 
     if(this.isPowerActive){
       this.fishLightCount += 1;
