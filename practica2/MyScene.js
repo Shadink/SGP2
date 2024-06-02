@@ -358,7 +358,7 @@ class MyScene extends THREE.Scene {
     if(this.power >= 10){
       this.power = 10;
       this.isPowerActive = true;
-      this.penwin.turnLightOn();
+      this.penwin.bonusAnimOn();
     }
     this.powerDisplay.textContent = `POWER: ${this.power}`;
   }
@@ -638,7 +638,7 @@ class MyScene extends THREE.Scene {
         this.powerDisplay.textContent = `POWER: ${this.power}`;
         if(this.power == 0){
           this.isPowerActive = false;
-          this.penwin.turnLightOff();
+          this.penwin.bonusAnimOff();
         }
         this.fishLightCount = 0;
       }

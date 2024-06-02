@@ -8,6 +8,7 @@ class Penwin extends THREE.Object3D {
     this.angle = 0;
     
     this.footMovingUp = true;
+    this.bonusanim = false;
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     //this.createGUI(gui,titleGui);
@@ -26,16 +27,34 @@ class Penwin extends THREE.Object3D {
     this.wingshape.quadraticCurveTo(0.5, -0.05, 0, -0.1);
     this.wingshape.lineTo(0, 0.1);
 
+    this.bonuswingshape = new THREE.Shape();
+
+    this.bonuswingshape.moveTo(0, 0.1);
+    this.bonuswingshape.quadraticCurveTo(0.2, 0, 0.3, 0.3);
+    this.bonuswingshape.quadraticCurveTo(0.25, 0.35, 0.3, 0.4);
+    this.bonuswingshape.lineTo(0.3, 0.6);
+    this.bonuswingshape.quadraticCurveTo(0.35, 0.58, 0.4, 0.5);
+    this.bonuswingshape.quadraticCurveTo(0.45, 0.475, 0.5, 0.4);
+    this.bonuswingshape.quadraticCurveTo(0.5, -0.05, 0, -0.1);
+    this.bonuswingshape.lineTo(0, 0.1);
+
     this.options = { depth: 0.01, steps: 2, bevelEnabled: false};
     this.winggeo = new THREE.ExtrudeGeometry(this.wingshape, this.options);
+    this.bonuswinggeo = new THREE.ExtrudeGeometry(this.bonuswingshape, this.options);
+
     this.wing = new THREE.Mesh(this.winggeo, this.blackmaterial);
     this.wing.rotation.y = (90 * Math.PI) / 180;
     this.wing.position.set(0, 0, -0.2);
+    this.bonuswing = new THREE.Mesh(this.bonuswinggeo, this.blackmaterial);
+    this.bonuswing.rotation.y = (90 * Math.PI) / 180;
+    this.bonuswing.position.set(0, 0, -0.2);
 
     this.wing2 = new THREE.Mesh(this.winggeo, this.blackmaterial);
     this.wing2.rotation.y = (-90 * Math.PI) / 180;
     this.wing2.position.set(0, 0, 0.2);
-
+    this.bonuswing2 = new THREE.Mesh(this.bonuswinggeo, this.blackmaterial);
+    this.bonuswing2.rotation.y = (-90 * Math.PI) / 180;
+    this.bonuswing2.position.set(0, 0, 0.2);
 
     //Torso
     this.torsogeo = new THREE.CylinderGeometry(0, 0.5, 1, 20);
@@ -112,6 +131,33 @@ class Penwin extends THREE.Object3D {
     this.pointlight.intensity = 0;
   }
 
+  bonusAnimOn(){
+    this.bonusanim = true;
+    this.turnLightOn();
+    this.modifiedpenwin.rotation.x = (45 * Math.PI) / 180;
+    this.foot.position.set(0, -0.7, -0.2);
+    this.foot.rotation.z = (90 * Math.PI) / 180;
+    this.foot2.position.set(0, -0.7, 0.2);
+    this.foot2.rotation.z = (90 * Math.PI) / 180;
+    this.modifiedpenwin.remove(this.wing);
+    this.modifiedpenwin.remove(this.wing2);
+    this.modifiedpenwin.add(this.bonuswing);
+    this.modifiedpenwin.add(this.bonuswing2);
+  }
+
+  bonusAnimOff(){
+    this.bonusanim = false;
+    this.turnLightOff();
+    this.modifiedpenwin.rotation.x = 0;
+    this.foot.position.set(0, -0.6, -0.2);
+    this.foot.rotation.z = 0;
+    this.foot2.position.set(0, -0.6, 0.2);
+    this.foot2.rotation.z = 0;
+    this.modifiedpenwin.remove(this.bonuswing);
+    this.modifiedpenwin.remove(this.bonuswing2);
+    this.modifiedpenwin.add(this.wing);
+    this.modifiedpenwin.add(this.wing2);
+  }
   hurtPenwin(){
     this.hurt = true;
   }
@@ -152,17 +198,19 @@ class Penwin extends THREE.Object3D {
       }
     }
     
-    if(this.footMovingUp){
-      this.foot.position.y += 0.01;
-      this.foot2.position.y -= 0.01;
-      if(this.foot.position.y >= -0.55){
-        this.footMovingUp = false;
-      }
-    } else {
-      this.foot.position.y -= 0.01;
-      this.foot2.position.y += 0.01;
-      if(this.foot.position.y <= -0.65){
-        this.footMovingUp = true;
+    if(!this.bonusanim){
+      if(this.footMovingUp){
+        this.foot.position.y += 0.01;
+        this.foot2.position.y -= 0.01;
+        if(this.foot.position.y >= -0.55){
+          this.footMovingUp = false;
+        }
+      } else {
+        this.foot.position.y -= 0.01;
+        this.foot2.position.y += 0.01;
+        if(this.foot.position.y <= -0.65){
+          this.footMovingUp = true;
+        }
       }
     }
 
